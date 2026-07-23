@@ -1,210 +1,333 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Báo Cáo Tuần & Google Drive — Sở KH&CN Tây Ninh</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Hệ thống Báo cáo Tuần & Google Drive - Sở KH&CN Tây Ninh</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
+        body { font-family: 'Inter', sans-serif; }
         [x-cloak] { display: none !important; }
-        @media print {
-            body { background: white; }
-            no-print { display: none; }
-        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-full flex flex-col font-sans" x-data="reportApp()">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col text-xs md:text-sm" x-data="app">
 
-    <!-- Top Navbar -->
-    <header class="bg-brand-900 text-white shadow-md z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header class="bg-indigo-900 text-white shadow-sm z-30 sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="bg-white/10 p-2 rounded-lg">
-                    <svg class="w-6 h-6 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
+                <div class="bg-indigo-800 p-1.5 rounded-lg">
+                    <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg tracking-tight">SỞ KHOA HỌC VÀ CÔNG NGHỆ TỈNH TÂY NINH</h1>
-                    <p class="text-xs text-indigo-200">Hệ thống Quản lý Báo cáo Tuần & Tích hợp Google Drive (Phiên bản 4.0)</p>
+                    <h1 class="font-bold text-sm leading-tight">SỞ KHOA HỌC VÀ CÔNG NGHỆ TỈNH TÂY NINH</h1>
+                    <p class="text-[10px] text-indigo-200">Hệ thống Báo cáo Tuần & Quản lý Thư mục Đồng bộ</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                    <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> <span x-text="'Drive: ' + driveAccount"></span>
-                </span>
-                <button @click="openDriveModal = true" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 9l5-5 5 5M12 4v12"/></svg>
-                    <span>Cấu hình Drive</span>
+
+            <!-- Header Action Button -->
+            <div class="flex items-center space-x-2">
+                <button @click="driveModal = true" class="bg-indigo-800 hover:bg-indigo-700 text-indigo-100 px-3 py-1.5 rounded-lg transition text-xs flex items-center space-x-1 shadow-sm whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>Thư mục lưu trữ</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <div class="flex-1 flex overflow-hidden">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20">
-            <div class="p-4 border-b border-slate-100">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Kỳ Báo Cáo Tuần</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="date" x-model="config.ngayBd" class="text-xs border rounded p-1.5 bg-slate-50">
-                    <input type="date" x-model="config.ngayKt" class="text-xs border rounded p-1.5 bg-slate-50">
-                </div>
-            </div>
-            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-                <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    0. Tổng quan hệ thống
-                </button>
-                <button @click="currentTab = 'departments'" :class="currentTab === 'departments' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    I. Dữ liệu 8 Bộ phận & Nhiệm vụ
-                </button>
-                <button @click="currentTab = 'finance'" :class="currentTab === 'finance' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    II. Tài chính & Giải ngân
-                </button>
-                <button @click="currentTab = 'preview'" :class="currentTab === 'preview' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    III. Xem trước & Xuất Word / Drive
-                </button>
-            </nav>
-            <div class="p-4 border-t border-slate-100 bg-slate-50">
-                <div class="text-xs text-slate-500 mb-2">Trạng thái đồng bộ Drive</div>
-                <button @click="syncToDrive()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center space-x-1.5 shadow">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                    <span x-text="isSyncing ? 'Đang tạo & lưu Drive...' : 'Tạo File Word trên Drive'"></span>
-                </button>
-            </div>
+    <!-- Main Layout with Vertical Sidebar Menu -->
+    <div class="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto">
+        <aside class="w-full md:w-64 bg-white border-r border-slate-200 p-3 flex flex-row md:flex-col space-x-1 md:space-x-0 md:space-y-1.5 overflow-x-auto md:overflow-visible flex-shrink-0 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1 hidden md:block">Menu Điều Hướng</div>
+            <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-indigo-600 text-white font-semibold shadow-sm' : 'text-slate-700 hover:bg-slate-100'" class="w-full text-left px-3 py-2 rounded-lg transition text-xs flex items-center space-x-2 whitespace-nowrap">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                <span>0. Tổng quan</span>
+            </button>
+            <button @click="currentTab = 'departments'" :class="currentTab === 'departments' ? 'bg-indigo-600 text-white font-semibold shadow-sm' : 'text-slate-700 hover:bg-slate-100'" class="w-full text-left px-3 py-2 rounded-lg transition text-xs flex items-center space-x-2 whitespace-nowrap">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span>I. Nhiệm vụ & Lịch</span>
+            </button>
+            <button @click="currentTab = 'finance'" :class="currentTab === 'finance' ? 'bg-indigo-600 text-white font-semibold shadow-sm' : 'text-slate-700 hover:bg-slate-100'" class="w-full text-left px-3 py-2 rounded-lg transition text-xs flex items-center space-x-2 whitespace-nowrap">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>II. Tài chính</span>
+            </button>
+            <button @click="currentTab = 'report'" :class="currentTab === 'report' ? 'bg-indigo-600 text-white font-semibold shadow-sm' : 'text-slate-700 hover:bg-slate-100'" class="w-full text-left px-3 py-2 rounded-lg transition text-xs flex items-center space-x-2 whitespace-nowrap">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>III. Bản in NĐ 30</span>
+            </button>
         </aside>
 
-        <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
-            
-            <!-- TAB 0: DASHBOARD -->
-            <div x-show="currentTab === 'dashboard'" class="max-w-6xl mx-auto space-y-6" x-cloak>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">Tổng quan Hoạt động Tuần</h2>
-                    <p class="text-sm text-slate-600">Hệ thống tự động tổng hợp số liệu từ báo cáo của 8 phòng chuyên môn và đơn vị trực thuộc Sở KH&CN Tây Ninh.</p>
+        <!-- Main Content Panel -->
+        <main class="flex-1 px-4 py-4 space-y-4">
+
+        <!-- TAB 0: DASHBOARD -->
+        <div x-show="currentTab === 'dashboard'" class="space-y-4" x-cloak>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Tổng quan Trạng thái Công việc</h2>
+                    <p class="text-[11px] text-slate-500">Phân loại số liệu nhiệm vụ theo biểu đồ tròn 4 dòng trạng thái trọng tâm tích hợp trực tiếp tỷ trọng và màu sắc. <span class="text-indigo-600 font-medium">(Nhấn vào từng phần thẻ trạng thái bên dưới để xem chi tiết)</span></p>
+                </div>
+                <button @click="currentTab = 'departments'" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">Xem tất cả nhiệm vụ →</button>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Circular Donut Chart Container with Embedded Status Breakdown (Col-span 6) -->
+                <div class="lg:col-span-6 flex flex-col items-center justify-center relative py-2">
+                    <div class="relative w-56 h-56 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 42 42" x-html="chartSvgHtml">
+                            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="4.5"></circle>
+                        </svg>
+                        <!-- Center Label with Percentage -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-4">
+                            <span class="text-2xl font-extrabold text-slate-900" x-text="tasks.length ? (((computed.completedOntime + computed.completedLate) / tasks.length * 100).toFixed(1) + '%') : '0%'"></span>
+                            <span class="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Tỷ lệ hoàn thành</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5" x-text="'(Tổng: ' + tasks.length + ' nhiệm vụ)'"></span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Metrics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase">Tổng số nhiệm vụ tuần</div>
-                        <div class="text-3xl font-bold text-indigo-600 mt-2" x-text="computed.kqTong"></div>
-                        <div class="text-xs text-slate-500 mt-1">Đúng hạn: <span class="font-medium text-emerald-600" x-text="computed.kqHt"></span></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase">Kế hoạch tuần tới</div>
-                        <div class="text-3xl font-bold text-amber-600 mt-2" x-text="computed.khTong"></div>
-                        <div class="text-xs text-slate-500 mt-1">Sắp đến hạn: <span class="font-medium text-red-600" x-text="computed.khSapHan"></span></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase">Giải ngân Sự nghiệp KH&CN</div>
-                        <div class="text-3xl font-bold text-emerald-600 mt-2" x-text="finance.snTl + '%'"></div>
-                        <div class="text-xs text-slate-500 mt-1">Đã giải ngân: <span class="font-medium" x-text="formatMoney(finance.snGn) + ' đ'"></span></div>
-                    </div>
-                </div>
-
-                <!-- Detailed Breakdown by Source Cards -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-                    <h3 class="font-bold text-slate-900 text-base">Phân tích Chi tiết Theo Nguồn Giao Nhiệm Vụ</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        <!-- NQ 57 -->
-                        <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                            <div class="text-xs font-semibold text-purple-700 uppercase">NQ 57-NQ/TW</div>
-                            <div class="text-2xl font-bold text-purple-900 mt-1" x-text="computed.kqNq57Tong"></div>
-                            <div class="text-xs text-purple-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqNq57Ht"></span></div>
+                <!-- Integrated 4 Status Attributes Embedded Grid (Col-span 6) -->
+                <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <template x-for="seg in chartSegments" :key="seg.filter">
+                        <div class="p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between hover:shadow-sm relative overflow-hidden group"
+                             :class="[seg.badgeBg, seg.borderCol]"
+                             @click="filterTasks(seg.filter, seg.label)">
+                            <!-- Left color indicator bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :style="'background-color: ' + seg.color"></div>
+                            <div class="flex justify-between items-start pl-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full flex-shrink-0 shadow-xs" :style="'background-color: ' + seg.color"></span>
+                                    <span class="text-[11px] font-bold text-slate-800 leading-tight" x-text="seg.label"></span>
+                                </div>
+                                <span class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-white shadow-xs ml-1 flex-shrink-0" :class="seg.textCol" x-text="seg.count"></span>
+                            </div>
+                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-200/50 text-[10px] text-slate-600 pl-2">
+                                <span>Tỷ trọng: <strong x-text="seg.percent.toFixed(1) + '%'"></strong></span>
+                                <span class="text-indigo-600 font-medium hover:underline">Lọc ngay →</span>
+                            </div>
                         </div>
-                        <!-- Bộ giao -->
-                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                            <div class="text-xs font-semibold text-blue-700 uppercase">Bộ giao</div>
-                            <div class="text-2xl font-bold text-blue-900 mt-1" x-text="computed.kqBoTong"></div>
-                            <div class="text-xs text-blue-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqBoHt"></span></div>
-                        </div>
-                        <!-- Tỉnh ủy giao -->
-                        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                            <div class="text-xs font-semibold text-indigo-700 uppercase">Tỉnh ủy giao</div>
-                            <div class="text-2xl font-bold text-indigo-900 mt-1" x-text="computed.kqTinhUyTong"></div>
-                            <div class="text-xs text-indigo-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqTinhUyHt"></span></div>
-                        </div>
-                        <!-- UBND tỉnh giao -->
-                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                            <div class="text-xs font-semibold text-emerald-700 uppercase">UBND tỉnh giao</div>
-                            <div class="text-2xl font-bold text-emerald-900 mt-1" x-text="computed.kqUbndTong"></div>
-                            <div class="text-xs text-emerald-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqUbndHt"></span></div>
-                        </div>
-                        <!-- Chuyên môn -->
-                        <div class="p-4 bg-slate-100 rounded-xl border border-slate-200">
-                            <div class="text-xs font-semibold text-slate-700 uppercase">Chuyên môn</div>
-                            <div class="text-2xl font-bold text-slate-900 mt-1" x-text="computed.kqChuyenMonTong"></div>
-                            <div class="text-xs text-slate-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqChuyenMonHt"></span></div>
-                        </div>
-                    </div>
+                    </template>
                 </div>
             </div>
 
-            <!-- TAB 1: DEPARTMENTS & TASKS -->
-            <div x-show="currentTab === 'departments'" class="max-w-6xl mx-auto space-y-6" x-cloak>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900">Quản lý Nhiệm vụ từ 8 Đầu vào Bộ phận</h2>
-                        <p class="text-sm text-slate-600">Thêm, sửa, hoặc chọn mẫu dữ liệu từ các phòng ban chức năng.</p>
+            <!-- Detailed Breakdown by Source Cards & Financial Summary -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Phân tích Theo Nguồn Giao Nhiệm Vụ & 04 Trạng Thái <span class="text-[10px] font-normal text-slate-400 lowercase">(Nhấn để lọc chi tiết)</span></h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- NQ57 -->
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-100 space-y-2">
+                            <div class="flex justify-between items-center cursor-pointer" @click="filterTasks('source_nq57', 'Nhiệm vụ NQ 57-NQ/TW')">
+                                <div class="text-[10px] font-semibold text-purple-700 uppercase">NQ 57-NQ/TW</div>
+                                <div class="text-sm font-bold text-purple-900" x-text="computed.kqNq57Tong + ' nhiệm vụ'"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                <div class="bg-white/90 p-1.5 rounded border border-purple-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('NQ57', 'Đã hoàn thành - Đúng hạn', 'NQ57 - HT Đúng hạn')">
+                                    <span class="text-slate-600">HT Đúng hạn:</span>
+                                    <span class="font-bold text-emerald-600" x-text="tasks.filter(t => t.source === 'NQ57' && t.status === 'Đã hoàn thành - Đúng hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-purple-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('NQ57', 'Đã hoàn thành - Trễ hạn', 'NQ57 - HT Trễ hạn')">
+                                    <span class="text-slate-600">HT Trễ hạn:</span>
+                                    <span class="font-bold text-amber-600" x-text="tasks.filter(t => t.source === 'NQ57' && t.status === 'Đã hoàn thành - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-purple-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('NQ57', 'Đang thực hiện - Trễ hạn', 'NQ57 - Đang TH Trễ hạn')">
+                                    <span class="text-slate-600">Đang TH Trễ:</span>
+                                    <span class="font-bold text-red-600" x-text="tasks.filter(t => t.source === 'NQ57' && t.status === 'Đang thực hiện - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-purple-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('NQ57', 'Đang thực hiện - Chưa tới hạn', 'NQ57 - Đang TH Chưa hạn')">
+                                    <span class="text-slate-600">Đang TH Chưa:</span>
+                                    <span class="font-bold text-blue-600" x-text="tasks.filter(t => t.source === 'NQ57' && t.status === 'Đang thực hiện - Chưa tới hạn').length"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bộ giao -->
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 space-y-2">
+                            <div class="flex justify-between items-center cursor-pointer" @click="filterTasks('source_bo', 'Nhiệm vụ Bộ giao')">
+                                <div class="text-[10px] font-semibold text-blue-700 uppercase">Bộ giao</div>
+                                <div class="text-sm font-bold text-blue-900" x-text="computed.kqBoTong + ' nhiệm vụ'"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                <div class="bg-white/90 p-1.5 rounded border border-blue-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Bộ', 'Đã hoàn thành - Đúng hạn', 'Bộ - HT Đúng hạn')">
+                                    <span class="text-slate-600">HT Đúng hạn:</span>
+                                    <span class="font-bold text-emerald-600" x-text="tasks.filter(t => t.source === 'Bộ' && t.status === 'Đã hoàn thành - Đúng hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-blue-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Bộ', 'Đã hoàn thành - Trễ hạn', 'Bộ - HT Trễ hạn')">
+                                    <span class="text-slate-600">HT Trễ hạn:</span>
+                                    <span class="font-bold text-amber-600" x-text="tasks.filter(t => t.source === 'Bộ' && t.status === 'Đã hoàn thành - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-blue-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Bộ', 'Đang thực hiện - Trễ hạn', 'Bộ - Đang TH Trễ hạn')">
+                                    <span class="text-slate-600">Đang TH Trễ:</span>
+                                    <span class="font-bold text-red-600" x-text="tasks.filter(t => t.source === 'Bộ' && t.status === 'Đang thực hiện - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-blue-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Bộ', 'Đang thực hiện - Chưa tới hạn', 'Bộ - Đang TH Chưa hạn')">
+                                    <span class="text-slate-600">Đang TH Chưa:</span>
+                                    <span class="font-bold text-blue-600" x-text="tasks.filter(t => t.source === 'Bộ' && t.status === 'Đang thực hiện - Chưa tới hạn').length"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tỉnh ủy giao -->
+                        <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100 space-y-2">
+                            <div class="flex justify-between items-center cursor-pointer" @click="filterTasks('source_tinhuy', 'Nhiệm vụ Tỉnh ủy giao')">
+                                <div class="text-[10px] font-semibold text-indigo-700 uppercase">Tỉnh ủy giao</div>
+                                <div class="text-sm font-bold text-indigo-900" x-text="computed.kqTinhUyTong + ' nhiệm vụ'"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                <div class="bg-white/90 p-1.5 rounded border border-indigo-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Tỉnh ủy', 'Đã hoàn thành - Đúng hạn', 'Tỉnh ủy - HT Đúng hạn')">
+                                    <span class="text-slate-600">HT Đúng hạn:</span>
+                                    <span class="font-bold text-emerald-600" x-text="tasks.filter(t => t.source === 'Tỉnh ủy' && t.status === 'Đã hoàn thành - Đúng hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-indigo-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Tỉnh ủy', 'Đã hoàn thành - Trễ hạn', 'Tỉnh ủy - HT Trễ hạn')">
+                                    <span class="text-slate-600">HT Trễ hạn:</span>
+                                    <span class="font-bold text-amber-600" x-text="tasks.filter(t => t.source === 'Tỉnh ủy' && t.status === 'Đã hoàn thành - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-indigo-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Tỉnh ủy', 'Đang thực hiện - Trễ hạn', 'Tỉnh ủy - Đang TH Trễ hạn')">
+                                    <span class="text-slate-600">Đang TH Trễ:</span>
+                                    <span class="font-bold text-red-600" x-text="tasks.filter(t => t.source === 'Tỉnh ủy' && t.status === 'Đang thực hiện - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-indigo-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('Tỉnh ủy', 'Đang thực hiện - Chưa tới hạn', 'Tỉnh ủy - Đang TH Chưa hạn')">
+                                    <span class="text-slate-600">Đang TH Chưa:</span>
+                                    <span class="font-bold text-blue-600" x-text="tasks.filter(t => t.source === 'Tỉnh ủy' && t.status === 'Đang thực hiện - Chưa tới hạn').length"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UBND tỉnh giao -->
+                        <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100 space-y-2">
+                            <div class="flex justify-between items-center cursor-pointer" @click="filterTasks('source_ubnd', 'Nhiệm vụ UBND tỉnh giao')">
+                                <div class="text-[10px] font-semibold text-emerald-700 uppercase">UBND tỉnh giao</div>
+                                <div class="text-sm font-bold text-emerald-900" x-text="computed.kqUbndTong + ' nhiệm vụ'"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                <div class="bg-white/90 p-1.5 rounded border border-emerald-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('UBND', 'Đã hoàn thành - Đúng hạn', 'UBND - HT Đúng hạn')">
+                                    <span class="text-slate-600">HT Đúng hạn:</span>
+                                    <span class="font-bold text-emerald-600" x-text="tasks.filter(t => t.source === 'UBND' && t.status === 'Đã hoàn thành - Đúng hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-emerald-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('UBND', 'Đã hoàn thành - Trễ hạn', 'UBND - HT Trễ hạn')">
+                                    <span class="text-slate-600">HT Trễ hạn:</span>
+                                    <span class="font-bold text-amber-600" x-text="tasks.filter(t => t.source === 'UBND' && t.status === 'Đã hoàn thành - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-emerald-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('UBND', 'Đang thực hiện - Trễ hạn', 'UBND - Đang TH Trễ hạn')">
+                                    <span class="text-slate-600">Đang TH Trễ:</span>
+                                    <span class="font-bold text-red-600" x-text="tasks.filter(t => t.source === 'UBND' && t.status === 'Đang thực hiện - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white/90 p-1.5 rounded border border-emerald-200 flex justify-between cursor-pointer hover:bg-white" @click="filterTasksStatus('UBND', 'Đang thực hiện - Chưa tới hạn', 'UBND - Đang TH Chưa hạn')">
+                                    <span class="text-slate-600">Đang TH Chưa:</span>
+                                    <span class="font-bold text-blue-600" x-text="tasks.filter(t => t.source === 'UBND' && t.status === 'Đang thực hiện - Chưa tới hạn').length"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chuyên môn nội bộ -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 sm:col-span-2">
+                            <div class="flex justify-between items-center cursor-pointer" @click="filterTasks('source_chuyenmon', 'Nhiệm vụ chuyên môn nội bộ')">
+                                <div class="text-[10px] font-semibold text-slate-700 uppercase">Chuyên môn nội bộ</div>
+                                <div class="text-sm font-bold text-slate-900" x-text="computed.kqChuyenMonTong + ' nhiệm vụ'"></div>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
+                                <div class="bg-white p-1.5 rounded border border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50" @click="filterTasksStatus('Chuyên môn', 'Đã hoàn thành - Đúng hạn', 'Chuyên môn - HT Đúng hạn')">
+                                    <span class="text-slate-600">HT Đúng hạn:</span>
+                                    <span class="font-bold text-emerald-600" x-text="tasks.filter(t => t.source === 'Chuyên môn' && t.status === 'Đã hoàn thành - Đúng hạn').length"></span>
+                                </div>
+                                <div class="bg-white p-1.5 rounded border border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50" @click="filterTasksStatus('Chuyên môn', 'Đã hoàn thành - Trễ hạn', 'Chuyên môn - HT Trễ hạn')">
+                                    <span class="text-slate-600">HT Trễ hạn:</span>
+                                    <span class="font-bold text-amber-600" x-text="tasks.filter(t => t.source === 'Chuyên môn' && t.status === 'Đã hoàn thành - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white p-1.5 rounded border border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50" @click="filterTasksStatus('Chuyên môn', 'Đang thực hiện - Trễ hạn', 'Chuyên môn - Đang TH Trễ hạn')">
+                                    <span class="text-slate-600">Đang TH Trễ:</span>
+                                    <span class="font-bold text-red-600" x-text="tasks.filter(t => t.source === 'Chuyên môn' && t.status === 'Đang thực hiện - Trễ hạn').length"></span>
+                                </div>
+                                <div class="bg-white p-1.5 rounded border border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50" @click="filterTasksStatus('Chuyên môn', 'Đang thực hiện - Chưa tới hạn', 'Chuyên môn - Đang TH Chưa hạn')">
+                                    <span class="text-slate-600">Đang TH Chưa:</span>
+                                    <span class="font-bold text-blue-600" x-text="tasks.filter(t => t.source === 'Chuyên môn' && t.status === 'Đang thực hiện - Chưa tới hạn').length"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button @click="addTaskModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-                        + Thêm Nhiệm vụ Mới
-                    </button>
                 </div>
 
-                <!-- Tasks Table -->
+                <!-- Financial Quick Summary (Compact) -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Giải ngân Ngân sách</h3>
+                        <p class="text-[11px] text-slate-500">Tỷ lệ giải ngân sự nghiệp KH&CN 2026.</p>
+                    </div>
+                    <div class="text-center py-2 bg-slate-50 rounded-lg border border-slate-100 space-y-0.5">
+                        <div class="text-2xl font-extrabold text-emerald-600" x-text="finance.snTl ? ((finance.snGn / finance.snTl) * 100).toFixed(1) + '%' : '0%'"></div>
+                        <div class="text-[10px] text-slate-500">Đã giải ngân / Tổng phân bổ</div>
+                    </div>
+                    <div class="space-y-1 text-[11px]">
+                        <div class="flex justify-between"><span class="text-slate-500">Đã giải ngân:</span> <span class="font-semibold text-slate-800" x-text="formatMoney(finance.snGn) + ' đ'"></span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Tổng kinh phí:</span> <span class="font-semibold text-slate-800" x-text="formatMoney(finance.snTl) + ' đ'"></span></div>
+                    </div>
+                    <button @click="currentTab = 'finance'" class="w-full py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-xs rounded-lg transition">Chi tiết tài chính →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: BÁO CÁO NHIỆM VỤ & ĐĂNG KÝ LỊCH -->
+        <div x-show="currentTab === 'departments'" class="space-y-4" x-cloak>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">I. Báo cáo nhiệm vụ & Đăng ký lịch công tác</h2>
+                    <p class="text-[11px] text-slate-500">Quản lý nhiệm vụ 8 phòng/trung tâm và lịch làm việc Ban Giám Đốc.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button @click="addTaskModal = true; taskModalTab = 'manual'" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow-sm flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span>Thêm Nhiệm Vụ</span>
+                    </button>
+                    <button @click="addTaskModal = true; taskModalTab = 'import'" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow-sm flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Import Word Thông Minh</span>
+                    </button>
+                    <button @click="addScheduleModal = true" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow-sm flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>Đăng ký Lịch BGĐ</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub-navigation between Tasks & Schedule -->
+            <div class="flex space-x-2 border-b border-slate-200 pb-2">
+                <button @click="subTab = 'tasks'" :class="subTab === 'tasks' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">1. Danh sách Nhiệm vụ</button>
+                <button @click="subTab = 'schedule'" :class="subTab === 'schedule' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">2. Đăng ký Lịch công tác BGĐ</button>
+            </div>
+
+            <!-- SUB-TAB 1.1: TASKS TABLE -->
+            <div x-show="subTab === 'tasks'" class="space-y-3">
+                <!-- Active Filter Banner -->
+                <div x-show="taskFilter.type && taskFilter.type !== 'all'" class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-3 rounded-xl flex items-center justify-between shadow-sm" x-cloak>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <svg class="w-4 h-4 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        <span>Đang lọc theo: <strong x-text="taskFilter.title"></strong> (<span x-text="filteredTasks.length"></span> nhiệm vụ)</span>
+                    </div>
+                    <button @click="clearFilter()" class="text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-2.5 py-1 rounded-md transition">Xem tất cả</button>
+                </div>
+
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Đơn vị / Phòng</th>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nội dung nhiệm vụ & Dẫn chứng</th>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nguồn giao</th>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Trạng thái</th>
-                                <th class="px-6 py-3 text-right font-semibold text-slate-600">Thao tác</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Đơn vị / Phòng</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Nội dung nhiệm vụ & Dẫn chứng</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Nguồn giao</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Trạng thái</th>
+                                <th class="px-4 py-2.5 text-right font-semibold text-slate-600">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200">
-                            <template x-for="(task, index) in tasks" :key="index">
-                                <tr>
-                                    <td class="px-6 py-4 font-medium text-slate-900" x-text="task.dept"></td>
-                                    <td class="px-6 py-4 text-slate-700 max-w-md">
+                            <template x-for="(task, index) in filteredTasks" :key="index">
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="px-4 py-3 font-medium text-slate-900" x-text="task.dept"></td>
+                                    <td class="px-4 py-3 text-slate-700 max-w-md">
                                         <div x-text="task.content" class="font-medium"></div>
-                                        <div x-show="task.evidence" class="text-xs text-indigo-600 mt-1 italic" x-text="'Dẫn chứng: ' + task.evidence"></div>
+                                        <div x-show="task.evidence" class="text-[11px] text-indigo-600 mt-0.5 italic" x-text="'Dẫn chứng: ' + task.evidence"></div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold" 
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold" 
                                               :class="{
                                                   'bg-purple-100 text-purple-800': task.source === 'NQ57',
                                                   'bg-blue-100 text-blue-800': task.source === 'Bộ',
@@ -213,8 +336,8 @@
                                                   'bg-slate-100 text-slate-800': task.source === 'Chuyên môn'
                                               }" x-text="task.source"></span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-xs font-medium px-2.5 py-1 rounded-full inline-block"
+                                    <td class="px-4 py-3">
+                                        <span class="text-[10px] font-medium px-2 py-0.5 rounded-full inline-block"
                                               :class="{
                                                   'bg-emerald-100 text-emerald-800': task.status === 'Đã hoàn thành - Đúng hạn',
                                                   'bg-amber-100 text-amber-800': task.status === 'Đã hoàn thành - Trễ hạn',
@@ -223,9 +346,14 @@
                                               }"
                                               x-text="task.status"></span>
                                     </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button @click="removeTask(index)" class="text-red-500 hover:text-red-700 font-medium text-xs">Xóa</button>
+                                    <td class="px-4 py-3 text-right">
+                                        <button @click="removeTask(index)" class="text-red-500 hover:text-red-700 font-medium text-[11px] bg-red-50 px-2 py-1 rounded transition">Xóa</button>
                                     </td>
+                                </tr>
+                            </template>
+                            <template x-if="filteredTasks.length === 0">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-slate-500 text-xs">Chưa có nhiệm vụ nào. Nhấn "Thêm Nhiệm vụ" để bắt đầu.</td>
                                 </tr>
                             </template>
                         </tbody>
@@ -233,202 +361,356 @@
                 </div>
             </div>
 
-            <!-- TAB 2: FINANCE -->
-            <div x-show="currentTab === 'finance'" class="max-w-4xl mx-auto space-y-6" x-cloak>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">Quản lý Tài chính & Giải ngân</h2>
-                    <p class="text-sm text-slate-600 mb-6">Cập nhật số liệu giải ngân vốn đầu tư công và sự nghiệp khoa học và công nghệ.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Đầu tư công -->
-                        <div class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                            <h3 class="font-semibold text-slate-900">1. Vốn Đầu tư Công năm 2026</h3>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Tổng kế hoạch vốn (VNĐ)</label>
-                                <input type="number" x-model.number="finance.vdtKh" class="w-full border rounded-lg p-2 text-sm bg-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Đã giải ngân đến nay (VNĐ)</label>
-                                <input type="number" x-model.number="finance.vdtGn" class="w-full border rounded-lg p-2 text-sm bg-white">
-                            </div>
-                            <div class="pt-2 border-t flex justify-between text-sm">
-                                <span class="text-slate-600">Tỷ lệ giải ngân:</span>
-                                <span class="font-bold text-indigo-600" x-text="finance.vdtTl + '%'"></span>
-                            </div>
-                        </div>
-
-                        <!-- Sự nghiệp KH&CN -->
-                        <div class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                            <h3 class="font-semibold text-slate-900">2. Kinh phí Sự nghiệp KH&CN</h3>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Tổng dự toán năm (VNĐ)</label>
-                                <input type="number" x-model.number="finance.snDt" class="w-full border rounded-lg p-2 text-sm bg-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Đã giải ngân đến nay (VNĐ)</label>
-                                <input type="number" x-model.number="finance.snGn" class="w-full border rounded-lg p-2 text-sm bg-white">
-                            </div>
-                            <div class="pt-2 border-t flex justify-between text-sm">
-                                <span class="text-slate-600">Tỷ lệ giải ngân:</span>
-                                <span class="font-bold text-emerald-600" x-text="finance.snTl + '%'"></span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- SUB-TAB 1.2: SCHEDULE TABLE -->
+            <div x-show="subTab === 'schedule'" class="space-y-3" x-cloak>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Thời gian</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Địa điểm</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Nội dung</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Ban Giám Đốc</th>
+                                <th class="px-4 py-2.5 text-left font-semibold text-slate-600">Phòng / Trung tâm</th>
+                                <th class="px-4 py-2.5 text-right font-semibold text-slate-600">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <template x-for="(sch, sIndex) in schedules" :key="sIndex">
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="px-4 py-3 font-semibold text-indigo-900" x-text="sch.time"></td>
+                                    <td class="px-4 py-3 text-slate-700" x-text="sch.location"></td>
+                                    <td class="px-4 py-3 text-slate-900 font-medium" x-text="sch.content"></td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800" x-text="sch.bgd"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-slate-600 text-[11px]" x-text="sch.dept"></td>
+                                    <td class="px-4 py-3 text-right">
+                                        <button @click="removeSchedule(sIndex)" class="text-red-500 hover:text-red-700 font-medium text-[11px] bg-red-50 px-2 py-1 rounded transition">Xóa</button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="schedules.length === 0">
+                                <tr>
+                                    <td colspan="6" class="px-4 py-8 text-center text-slate-500 text-xs">Chưa có lịch đăng ký. Nhấn "Đăng ký Lịch BGĐ" để thêm mới.</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <!-- TAB 3: PREVIEW & WORD EXPORT -->
-            <div x-show="currentTab === 'preview'" class="max-w-4xl mx-auto space-y-6" x-cloak>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center no-print">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">Xem trước Văn bản Báo cáo Chính thức</h2>
-                        <p class="text-xs text-slate-500">Chuẩn theo Nghị định số 30/2020/NĐ-CP về công tác văn thư</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button @click="exportWord()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center space-x-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Tải Xuống File Word (.doc)</span>
-                        </button>
-                        <button @click="syncToDrive()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center space-x-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 9l5-5 5 5M12 4v12"/></svg>
-                            <span>Lưu lên Google Drive</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Official Document Preview Box -->
-                <div id="reportPreview" class="bg-white p-12 rounded-xl shadow-sm border border-slate-200 font-serif leading-relaxed text-slate-900 space-y-6">
-                    <!-- Header -->
-                    <div class="grid grid-cols-2 text-center text-sm">
-                        <div>
-                            <p class="font-bold">UBND TỈNH TÂY NINH</p>
-                            <p class="font-bold underline">SỞ KHOA HỌC VÀ CÔNG NGHỆ</p>
-                            <p class="mt-2">Số: [SO_BC]/BC-SKHCN</p>
-                        </div>
-                        <div>
-                            <p class="font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                            <p class="font-bold underline">Độc lập – Tự do – Hạnh phúc</p>
-                            <p class="mt-2 italic">Tây Ninh, ngày <span x-text="config.ngay"></span> tháng <span x-text="config.thang"></span> năm <span x-text="config.nam"></span></p>
-                        </div>
-                    </div>
-
-                    <!-- Title -->
-                    <div class="text-center space-y-2 pt-6">
-                        <h3 class="font-bold text-lg uppercase">BÁO CÁO TUẦN</h3>
-                        <p class="font-semibold text-sm">Kết quả thực hiện nhiệm vụ công tác<br>(từ ngày <span x-text="formatDate(config.ngayBd)"></span> đến ngày <span x-text="formatDate(config.ngayKt)"></span>) và kế hoạch công tác tuần tới</p>
-                    </div>
-
-                    <!-- Opening -->
-                    <p class="text-justify text-sm">
-                        Thực hiện Công văn số 394/UBND-TH ngày 09/7/2025 của UBND tỉnh về việc thực hiện chế độ báo cáo nhanh hàng tuần về tình hình kinh tế – xã hội, Sở Khoa học và Công nghệ báo cáo nhanh kết quả triển khai các nhiệm vụ trọng tâm thuộc lĩnh vực Khoa học và Công nghệ (KH&CN), cụ thể như sau:
-                    </p>
-
-                    <!-- Section I -->
-                    <div class="space-y-4 text-sm">
-                        <h4 class="font-bold uppercase">I. KẾT QUẢ NỔI BẬT</h4>
-                        <p class="text-justify">
-                            Trong tuần, triển khai thực hiện Nghị quyết số 57-NQ/TW và theo chỉ đạo của Trung ương (Bộ), Tỉnh ủy, HĐND, UBND tỉnh, Sở đã xử lý tổng cộng <strong x-text="computed.kqTong"></strong> nhiệm vụ, trong đó hoàn thành đúng hạn <strong x-text="computed.kqHt"></strong> nhiệm vụ, cụ thể:
-                        </p>
-                        
-                        <div>
-                            <h5 class="font-semibold">1. Triển khai thực hiện Nghị quyết 57-NQ/TW (hoàn thành <span x-text="computed.kqNq57Ht"></span>/<span x-text="computed.kqNq57Tong"></span> nhiệm vụ đúng hạn)</h5>
-                            <p class="italic text-xs text-slate-600 mt-1">• Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ trên Hệ thống thông tin giám sát, đánh giá việc thực hiện Nghị quyết số 57-NQ/TW của tỉnh.</p>
-                        </div>
-
-                        <div>
-                            <h5 class="font-semibold">2. Kết quả thực hiện nhiệm vụ do Trung ương (Bộ) giao (<span x-text="computed.kqBoTong"></span> nhiệm vụ)</h5>
-                            <p class="italic text-xs text-slate-600 mt-1">• Gửi văn bản góp ý Bộ Khoa học và Công nghệ đối với dự thảo Quyết định của Thủ tướng Chính phủ.</p>
-                        </div>
-
-                        <div>
-                            <h5 class="font-semibold">3. Kết quả thực hiện nhiệm vụ do Tỉnh ủy giao</h5>
-                            <p class="italic text-xs text-slate-600 mt-1">• Các nhiệm vụ bám sát Chương trình trọng tâm của Tỉnh ủy.</p>
-                        </div>
-
-                        <div>
-                            <h5 class="font-semibold">4. Kết quả thực hiện nhiệm vụ do HĐND, UBND tỉnh giao</h5>
-                            <p class="italic text-xs text-slate-600 mt-1">• Triển khai toàn diện các lĩnh vực: Khoa học, Công nghệ & ĐMST, Chuyển đổi số, TCĐLCL và Kế hoạch - Tài chính.</p>
-                        </div>
-                    </div>
-
-                    <!-- Section II -->
-                    <div class="space-y-3 text-sm">
-                        <h4 class="font-bold uppercase">II. KẾT QUẢ THỰC HIỆN NHIỆM VỤ CHUYÊN MÔN</h4>
-                        <p class="italic text-xs text-slate-600">(Chi tiết từng lĩnh vực tại Phụ lục I kèm theo)</p>
-                        <ul class="list-disc pl-5 space-y-1 text-xs">
-                            <li><strong>Khoa học:</strong> Đang theo dõi 110 nhiệm vụ KH&CN, rà soát quy trình trực tuyến.</li>
-                            <li><strong>Công nghệ & ĐMST:</strong> Cấp 09 giấy phép sử dụng tần số vô tuyến điện, giải quyết hồ sơ bức xạ.</li>
-                            <li><strong>Chuyển đổi số:</strong> Đẩy mạnh đề án AI tự chủ, thẩm định dự án CNTT cơ sở.</li>
-                            <li><strong>Tiêu chuẩn Đo lường Chất lượng:</strong> Xử lý hồ sơ kiểm tra hàng hóa nhập khẩu rủi ro cao.</li>
-                            <li><strong>Kế hoạch – Tài chính:</strong> Giải ngân vốn đầu tư công đạt <strong x-text="finance.vdtTl + '%'"></strong>; kinh phí sự nghiệp KH&CN đạt <strong x-text="finance.snTl + '%'"></strong> (<span x-text="formatMoney(finance.snGn)"></span> đồng).</li>
-                        </ul>
-                    </div>
-
-                    <!-- Section III -->
-                    <div class="space-y-4 text-sm">
-                        <h4 class="font-bold uppercase">III. KẾ HOẠCH TRỌNG TÂM TUẦN TỚI</h4>
-                        <p>Tổng cộng <strong x-text="computed.khTong"></strong> nhiệm vụ, trong đó:</p>
-                        <ul class="list-disc pl-5 space-y-1 text-xs">
-                            <li><strong><span x-text="computed.khSapHan"></span> nhiệm vụ</strong> sắp đến hạn (trong vòng 7 ngày);</li>
-                            <li><strong><span x-text="computed.khChuaHan"></span> nhiệm vụ</strong> chưa đến hạn.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Closing & Signature -->
-                    <div class="grid grid-cols-2 pt-8 text-center text-sm">
-                        <div></div>
-                        <div>
-                            <p class="font-bold">KT. GIÁM ĐỐC</p>
-                            <p class="font-bold">PHÓ GIÁM ĐỐC</p>
-                            <p class="mt-20 font-bold" x-text="config.nguoiKy"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- Google Drive Modal Configuration -->
-    <div x-show="openDriveModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4" x-cloak>
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-900">Cấu hình Tích hợp Google Drive</h3>
-                <button @click="openDriveModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-            <p class="text-sm text-slate-600">Cập nhật tài khoản Google Workspace và thư mục lưu trữ báo cáo tự động của Sở.</p>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Tài khoản Google Drive (Email)</label>
-                    <input type="email" x-model="driveAccount" class="w-full border rounded-lg p-2 text-sm bg-white focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Thư mục lưu trữ báo cáo</label>
-                    <input type="text" x-model="driveFolder" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div class="flex items-center space-x-2 pt-1">
-                    <input type="checkbox" id="autoSyncCheck" x-model="autoSync" class="rounded text-indigo-600 focus:ring-indigo-500">
-                    <label for="autoSyncCheck" class="text-xs font-medium text-slate-700">Tự động đồng bộ khi xuất báo cáo tuần</label>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-2 pt-2">
-                <button @click="openDriveModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Hủy</button>
-                <button @click="saveDriveConfig()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm">Lưu cấu hình</button>
             </div>
         </div>
+
+        <!-- TAB 2: FINANCE -->
+        <div x-show="currentTab === 'finance'" class="space-y-4" x-cloak>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="font-bold text-slate-900 text-sm mb-0.5">Tài chính & Ngân sách KH&CN</h2>
+                <p class="text-[11px] text-slate-500">Quản lý nguồn kinh phí sự nghiệp và đầu tư công năm 2026.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Kinh phí Sự nghiệp KH&CN</h3>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-600">Tổng kinh phí phân bổ (VNĐ)</label>
+                            <input type="number" x-model.number="finance.snTl" class="w-full mt-1 px-3 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-600">Đã giải ngân (VNĐ)</label>
+                            <input type="number" x-model.number="finance.snGn" class="w-full mt-1 px-3 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-xs font-semibold text-slate-700 border-t">
+                            <span>Tỷ lệ giải ngân:</span>
+                            <span class="text-emerald-600 text-sm font-bold" x-text="finance.snTl ? ((finance.snGn / finance.snTl) * 100).toFixed(1) + '%' : '0%'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Vốn Đầu tư công</h3>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-600">Tổng vốn giao (VNĐ)</label>
+                            <input type="number" x-model.number="finance.nsTl" class="w-full mt-1 px-3 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-600">Đã giải ngân (VNĐ)</label>
+                            <input type="number" x-model.number="finance.nsGn" class="w-full mt-1 px-3 py-1.5 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-xs font-semibold text-slate-700 border-t">
+                            <span>Tỷ lệ giải ngân:</span>
+                            <span class="text-emerald-600 text-sm font-bold" x-text="finance.nsTl ? ((finance.nsGn / finance.nsTl) * 100).toFixed(1) + '%' : '0%'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: REPORT PREVIEW (NĐ 30/2020) & PHỤ LỤC -->
+        <div x-show="currentTab === 'report'" class="space-y-6" x-cloak>
+            <!-- BÁO CÁO CHÍNH -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 max-w-3xl mx-auto space-y-4 font-serif text-xs leading-relaxed">
+                <div class="flex justify-between items-start border-b pb-4 text-center">
+                    <div class="w-1/2 text-[10px] uppercase font-sans font-semibold">
+                        <p>UBND TỈNH TÂY NINH</p>
+                        <p class="font-bold text-indigo-900">SỞ KHOA HỌC VÀ CÔNG NGHỆ</p>
+                        <div class="w-20 h-0.5 bg-slate-300 mx-auto my-1"></div>
+                        <p class="text-[9px] text-slate-500">Số: ......../BC-SKHCN</p>
+                    </div>
+                    <div class="w-1/2 text-[10px] uppercase font-sans font-semibold">
+                        <p>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                        <p class="font-bold">ĐỘC LẬP - TỰ DO - HẠNH PHÚC</p>
+                        <div class="w-24 h-0.5 bg-slate-300 mx-auto my-1"></div>
+                        <p class="text-[9px] text-slate-500 normal-case italic">Tây Ninh, ngày ...... tháng 4 năm 2026</p>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-1 pt-2">
+                    <h2 class="text-xs font-bold uppercase font-sans tracking-wide text-slate-900">BÁO CÁO TUẦN</h2>
+                    <p class="text-xs font-bold font-sans text-slate-800">Kết quả thực hiện nhiệm vụ công tác<br>(từ ngày 06/4/2026 đến ngày 12/4/2026) và kế hoạch công tác tuần tới</p>
+                    <div class="w-16 h-0.5 bg-slate-400 mx-auto my-2"></div>
+                </div>
+
+                <div class="space-y-3 text-slate-800 pt-1">
+                    <p class="italic" style="text-indent: 1.27cm; text-align: justify;">Thực hiện Công văn số 394/UBND-TH ngày 09/7/2025 của UBND tỉnh về việc thực hiện chế độ báo cáo nhanh hàng tuần về tình hình kinh tế - xã hội.</p>
+                    <p style="text-indent: 1.27cm; text-align: justify;">Sở Khoa học và Công nghệ báo cáo nhanh kết quả triển khai các nhiệm vụ trọng tâm thuộc lĩnh vực Khoa học và Công nghệ (KH&CN), cụ thể như sau:</p>
+                    
+                    <div>
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">I. KẾT QUẢ NỔI BẬT</h3>
+                        <p class="mt-0.5" style="text-indent: 1.27cm; text-align: justify;">Tổng cộng có <strong x-text="tasks.length"></strong> nhiệm vụ được theo dõi. Trong đó:</p>
+                        
+                        <div class="mt-2 space-y-2 pl-3">
+                            <p class="font-semibold">1. Triển khai thực hiện Nghị quyết 57-NQ/TW (<span x-text="tasks.filter(t => t.source === 'NQ57').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'NQ57')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">2. Kết quả thực hiện nhiệm vụ do Trung ương/Bộ giao (<span x-text="tasks.filter(t => t.source === 'Bộ').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'Bộ')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">3. Kết quả thực hiện nhiệm vụ do Tỉnh ủy giao (<span x-text="tasks.filter(t => t.source === 'Tỉnh ủy').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'Tỉnh ủy')">
+                                    <li><span x-text="t.content"></span></li>
+                                </template>
+                                <template x-if="tasks.filter(t => t.source === 'Tỉnh ủy').length === 0">
+                                    <li class="text-slate-500 italic">Không có.</li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">4. Kết quả thực hiện nhiệm vụ do HĐND, UBND giao (<span x-text="tasks.filter(t => t.source === 'UBND').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'UBND')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pt-1">
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">II. KẾT QUẢ THỰC HIỆN NHIỆM VỤ CHUYÊN MÔN</h3>
+                        <p class="mt-0.5 italic" style="text-indent: 1.27cm;">(Chi tiết từng lĩnh vực được trình bày tại Phụ lục I kèm theo).</p>
+                    </div>
+
+                    <div class="pt-1">
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">III. KẾ HOẠCH TRỌNG TÂM SẮP TỚI</h3>
+                        <p class="mt-0.5" style="text-indent: 1.27cm;">Các nhiệm vụ đang triển khai:</p>
+                        <ul class="list-disc pl-4 mt-0.5 space-y-1">
+                            <template x-for="t in tasks.filter(x => x.status && x.status.includes('Đang thực hiện'))">
+                                <li><span x-text="t.content"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <p class="pt-2" style="text-indent: 1.27cm; text-align: justify;">Trên đây là báo cáo nhanh tuần của Sở KH&CN, kính gửi Văn phòng UBND tỉnh tổng hợp./.</p>
+                </div>
+                    <div class="w-1/2 text-[10px] uppercase font-sans font-semibold">
+                        <p>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                        <p class="font-bold">Độc lập - Tự do - Hạnh phúc</p>
+                        <div class="w-24 h-0.5 bg-slate-300 mx-auto my-1"></div>
+                        <p class="text-[9px] text-slate-500 normal-case">Tây Ninh, ngày ...... tháng 4 năm 2026</p>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-1 pt-2">
+                    <h2 class="text-xs font-bold uppercase font-sans tracking-wide text-slate-900">BÁO CÁO TUẦN</h2>
+                    <p class="text-xs font-bold font-sans text-slate-800">Kết quả thực hiện nhiệm vụ công tác<br>(từ ngày 06/4/2026 đến ngày 12/4/2026) và kế hoạch công tác tuần tới</p>
+                    <div class="w-16 h-0.5 bg-slate-400 mx-auto my-2"></div>
+                </div>
+
+                <div class="space-y-3 text-slate-800 pt-1">
+                    <p class="italic">Thực hiện Công văn số 394/UBND-TH ngày 09/7/2025 của UBND tỉnh về việc thực hiện chế độ báo cáo nhanh hàng tuần về tình hình kinh tế - xã hội.</p>
+                    <p>Sở Khoa học và Công nghệ báo cáo nhanh kết quả triển khai các nhiệm vụ trọng tâm thuộc lĩnh vực Khoa học và Công nghệ (KH&CN), cụ thể như sau:</p>
+                    
+                    <div>
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">I. KẾT QUẢ NỔI BẬT</h3>
+                        <p class="mt-0.5">Tổng cộng có <strong x-text="tasks.length"></strong> nhiệm vụ được theo dõi. Trong đó:</p>
+                        
+                        <div class="mt-2 space-y-2 pl-3">
+                            <p class="font-semibold">1. Triển khai thực hiện Nghị quyết 57-NQ/TW (<span x-text="tasks.filter(t => t.source === 'NQ57').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'NQ57')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">2. Kết quả thực hiện nhiệm vụ do Trung ương/Bộ giao (<span x-text="tasks.filter(t => t.source === 'Bộ').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'Bộ')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">3. Kết quả thực hiện nhiệm vụ do Tỉnh ủy giao (<span x-text="tasks.filter(t => t.source === 'Tỉnh ủy').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'Tỉnh ủy')">
+                                    <li><span x-text="t.content"></span></li>
+                                </template>
+                                <template x-if="tasks.filter(t => t.source === 'Tỉnh ủy').length === 0">
+                                    <li class="text-slate-500 italic">Không có.</li>
+                                </template>
+                            </ul>
+
+                            <p class="font-semibold pt-1">4. Kết quả thực hiện nhiệm vụ do HĐND, UBND giao (<span x-text="tasks.filter(t => t.source === 'UBND').length"></span> nhiệm vụ)</p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <template x-for="t in tasks.filter(t => t.source === 'UBND')">
+                                    <li><span x-text="t.content"></span> <span class="text-[10px] text-indigo-700 italic" x-text="t.evidence ? '(Dẫn chứng: ' + t.evidence + ')' : ''"></span></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pt-1">
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">II. KẾT QUẢ THỰC HIỆN NHIỆM VỤ CHUYÊN MÔN</h3>
+                        <p class="mt-0.5 italic">(Chi tiết từng lĩnh vực được trình bày tại Phụ lục I kèm theo).</p>
+                    </div>
+
+                    <div class="pt-1">
+                        <h3 class="font-bold font-sans uppercase text-[11px] tracking-wider text-slate-700">III. KẾ HOẠCH TRỌNG TÂM SẮP TỚI</h3>
+                        <p class="mt-0.5">Các nhiệm vụ đang triển khai:</p>
+                        <ul class="list-disc pl-4 mt-0.5 space-y-1">
+                            <template x-for="t in tasks.filter(x => x.status && x.status.includes('Đang thực hiện'))">
+                                <li><span x-text="t.content"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <p class="pt-2">Trên đây là báo cáo nhanh tuần của Sở KH&CN, kính gửi Văn phòng UBND tỉnh tổng hợp./.</p>
+                </div>
+
+                <div class="pt-6 flex justify-between items-start font-sans text-[10px]">
+                    <div class="space-y-0.5 text-slate-600">
+                        <p class="font-bold uppercase text-slate-800">Nơi nhận:</p>
+                        <p>- Văn phòng Tỉnh ủy;</p>
+                        <p>- Văn phòng UBND tỉnh;</p>
+                        <p>- GĐ, các PGĐ Sở;</p>
+                        <p>- Lưu: VT, VP.</p>
+                    </div>
+                    <div class="text-center space-y-10 pr-6">
+                        <div>
+                            <p class="font-bold uppercase text-slate-900">KT. GIÁM ĐỐC</p>
+                            <p class="font-bold uppercase text-slate-900">PHÓ GIÁM ĐỐC</p>
+                            <p class="text-[9px] text-slate-500 mt-8">(Ký, đóng dấu)</p>
+                            <p class="font-bold text-slate-900 mt-1">Nguyễn Trung Hiếu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHỤ LỤC I -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 max-w-3xl mx-auto space-y-4 font-serif text-xs leading-relaxed">
+                <div class="text-center space-y-1">
+                    <p class="text-[10px] font-sans uppercase font-semibold">PHỤ LỤC I</p>
+                    <h3 class="text-xs font-bold uppercase font-sans text-slate-900">KẾT QUẢ THỰC HIỆN NHIỆM VỤ CHUYÊN MÔN CỦA SỞ</h3>
+                    <p class="text-[10px] italic font-sans text-slate-600">(Kèm theo Báo cáo số ........ /BC-SKHCN ngày ...... tháng 4 năm 2026)</p>
+                    <div class="w-24 h-0.5 bg-slate-400 mx-auto my-1"></div>
+                </div>
+
+                <div class="space-y-3 text-slate-800">
+                    <div>
+                        <h4 class="font-bold font-sans text-slate-900">1. Lĩnh vực Khoa học</h4>
+                        <p class="mt-0.5">Phối hợp hoàn thiện phần mềm quản lý quy trình nhiệm vụ KH&CN trực tuyến.</p>
+                        <p class="mt-1 font-semibold text-emerald-700">Kinh phí giải ngân sự nghiệp KH&CN:</p>
+                        <p>Tổng phân bổ: <span x-text="formatMoney(finance.snTl)"></span> đ. Đã giải ngân: <span x-text="formatMoney(finance.snGn)"></span> đ (Đạt <span x-text="finance.snTl ? ((finance.snGn / finance.snTl) * 100).toFixed(1) + '%' : '0%'"></span>).</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold font-sans text-slate-900">2. Lĩnh vực Công nghệ & Đổi mới sáng tạo</h4>
+                        <p class="mt-0.5">Triển khai xây dựng Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold font-sans text-slate-900">3. Lĩnh vực Chuyển đổi số & CNTT</h4>
+                        <p class="mt-0.5">Triển khai Dự án xây dựng hệ sinh thái AI tự chủ phục vụ cơ quan nhà nước tỉnh Tây Ninh.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHỤ LỤC III: LỊCH CÔNG TÁC BAN GIÁM ĐỐC -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 max-w-3xl mx-auto space-y-4 font-serif text-xs leading-relaxed">
+                <div class="text-center space-y-1">
+                    <p class="text-[10px] font-sans uppercase font-semibold">PHỤ LỤC III</p>
+                    <h3 class="text-xs font-bold uppercase font-sans text-slate-900">CHƯƠNG TRÌNH LÀM VIỆC CỦA BAN GIÁM ĐỐC SỞ</h3>
+                    <p class="text-[10px] italic font-sans text-slate-600">(Từ ngày 13/4/2026 đến ngày 19/4/2026)</p>
+                    <div class="w-24 h-0.5 bg-slate-400 mx-auto my-1"></div>
+                </div>
+
+                <div class="overflow-x-auto font-sans">
+                    <table class="min-w-full divide-y divide-slate-300 text-[11px]">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-2.5 py-2 text-left font-semibold text-slate-700">Thời gian</th>
+                                <th class="px-2.5 py-2 text-left font-semibold text-slate-700">Địa điểm</th>
+                                <th class="px-2.5 py-2 text-left font-semibold text-slate-700">Nội dung</th>
+                                <th class="px-2.5 py-2 text-left font-semibold text-slate-700">BGĐ</th>
+                                <th class="px-2.5 py-2 text-left font-semibold text-slate-700">Phòng/Đơn vị</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <template x-for="sch in schedules">
+                                <tr>
+                                    <td class="px-2.5 py-2 font-medium text-slate-900" x-text="sch.time"></td>
+                                    <td class="px-2.5 py-2 text-slate-700" x-text="sch.location"></td>
+                                    <td class="px-2.5 py-2 text-slate-900" x-text="sch.content"></td>
+                                    <td class="px-2.5 py-2 font-semibold text-indigo-800" x-text="sch.bgd"></td>
+                                    <td class="px-2.5 py-2 text-slate-600" x-text="sch.dept"></td>
+                                </tr>
+                            </template>
+                            <template x-if="schedules.length === 0">
+                                <tr>
+                                    <td colspan="5" class="px-2.5 py-4 text-center text-slate-500 italic">Chưa có lịch công tác.</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
     </div>
 
-    <!-- Add Task Modal -->
-    <div x-show="addTaskModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4" x-cloak>
-        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-900">Thêm Nhiệm Vụ Mới</h3>
-                <button @click="addTaskModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+    <!-- ADD TASK MODAL -->
+    <div x-show="addTaskModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+        <div class="bg-white rounded-xl max-w-lg w-full p-5 shadow-xl space-y-3 max-h-[90vh] overflow-y-auto text-xs">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-900 text-sm">Quản lý Thêm Nhiệm Vụ</h3>
+                <div class="flex space-x-1">
+                    <button @click="taskModalTab = 'manual'" :class="taskModalTab === 'manual' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-2.5 py-1 rounded-md font-semibold transition text-[11px]">1. Thủ công</button>
+                    <button @click="taskModalTab = 'import'" :class="taskModalTab === 'import' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-2.5 py-1 rounded-md font-semibold transition text-[11px]">2. Import Word</button>
+                </div>
             </div>
-            <div class="space-y-3">
+            
+            <!-- MANUAL TAB -->
+            <div x-show="taskModalTab === 'manual'" class="space-y-2.5">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Đơn vị / Phòng ban</label>
-                    <select x-model="newTask.dept" class="w-full border rounded-lg p-2 text-sm">
+                    <label class="font-medium text-slate-600">Đơn vị / Phòng ban</label>
+                    <select x-model="newTask.dept" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                         <option>Phòng Khoa học</option>
                         <option>Phòng Công nghệ & ĐMST</option>
                         <option>Phòng Chuyển đổi số</option>
@@ -436,173 +718,462 @@
                         <option>Phòng Kế hoạch – Tài chính</option>
                         <option>Văn phòng Sở</option>
                         <option>Trung tâm Chuyển đổi số</option>
-                        <option>Trung tâm KHCN & ĐMST</option>
+                        <option>Trung tâm KHCN&ĐMST</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Nội dung nhiệm vụ</label>
-                    <textarea x-model="newTask.content" rows="3" class="w-full border rounded-lg p-2 text-sm" placeholder="Nhập nội dung nhiệm vụ..."></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-700 mb-1">Nguồn giao</label>
-                        <select x-model="newTask.source" class="w-full border rounded-lg p-2 text-sm">
-                            <option value="NQ57">Nghị quyết 57</option>
-                            <option value="Bộ">Bộ giao</option>
-                            <option value="Tỉnh ủy">Tỉnh ủy giao</option>
-                            <option value="UBND">UBND tỉnh giao</option>
-                            <option value="Chuyên môn">Chuyên môn nội bộ</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-700 mb-1">Trạng thái chi tiết</label>
-                        <select x-model="newTask.status" class="w-full border rounded-lg p-2 text-sm">
-                            <option value="Đã hoàn thành - Đúng hạn">Đã hoàn thành - Đúng hạn</option>
-                            <option value="Đã hoàn thành - Trễ hạn">Đã hoàn thành - Trễ hạn</option>
-                            <option value="Đang thực hiện - Trễ hạn">Đang thực hiện - Trễ hạn</option>
-                            <option value="Đang thực hiện - Chưa tới hạn">Đang thực hiện - Chưa tới hạn</option>
-                        </select>
-                    </div>
+                    <label class="font-medium text-slate-600">Nội dung nhiệm vụ</label>
+                    <textarea x-model="newTask.content" rows="2" placeholder="Nhập nội dung chi tiết..." class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Dẫn chứng / Văn bản liên quan</label>
-                    <textarea x-model="newTask.evidence" rows="2" class="w-full border rounded-lg p-2 text-sm" placeholder="Nhập số quyết định, văn bản, link dẫn chứng..."></textarea>
+                    <label class="font-medium text-slate-600">Nguồn giao</label>
+                    <select x-model="newTask.source" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="NQ57">NQ 57-NQ/TW</option>
+                        <option value="Bộ">Bộ giao</option>
+                        <option value="Tỉnh ủy">Tỉnh ủy giao</option>
+                        <option value="UBND">UBND tỉnh giao</option>
+                        <option value="Chuyên môn">Chuyên môn nội bộ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">Trạng thái</label>
+                    <select x-model="newTask.status" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option>Đã hoàn thành - Đúng hạn</option>
+                        <option>Đã hoàn thành - Trễ hạn</option>
+                        <option>Đang thực hiện - Trễ hạn</option>
+                        <option>Đang thực hiện - Chưa tới hạn</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">Dẫn chứng</label>
+                    <input type="text" x-model="newTask.evidence" placeholder="Ví dụ: Công văn số 4231/SKHCN-CĐS" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button @click="addTaskModal = false" class="px-3 py-1.5 border rounded-lg font-medium text-slate-600 hover:bg-slate-50">Hủy</button>
+                    <button @click="addTask()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-sm">Lưu nhiệm vụ</button>
                 </div>
             </div>
-            <div class="flex justify-end space-x-2 pt-2">
-                <button @click="addTaskModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Hủy</button>
-                <button @click="addTask()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Thêm nhiệm vụ</button>
+
+            <!-- SMART WORD IMPORT TAB -->
+            <div x-show="taskModalTab === 'import'" class="space-y-3" x-cloak>
+                <div class="bg-purple-50 p-3 rounded-lg border border-purple-100 space-y-1">
+                    <div class="font-semibold text-purple-900 uppercase text-[10px]">Trích xuất file Word (.doc, .docx, .txt)</div>
+                    <p class="text-[11px] text-purple-700">Tải lên văn bản để hệ thống tự động nhận diện nhóm nhiệm vụ.</p>
+                </div>
+
+                <div class="space-y-2">
+                    <input type="file" id="wordFileInput" accept=".doc,.docx,.txt" @change="parseWordFile($event)" class="block w-full text-[11px] text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer border rounded-lg p-1">
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="font-medium text-slate-600">Phòng mặc định</label>
+                            <select x-model="importDefaultDept" class="w-full mt-1 px-2.5 py-1.5 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none">
+                                <option>Phòng Khoa học</option>
+                                <option>Phòng Công nghệ & ĐMST</option>
+                                <option>Phòng Chuyển đổi số</option>
+                                <option>Phòng TCĐLCL</option>
+                                <option>Phòng Kế hoạch – Tài chính</option>
+                                <option>Văn phòng Sở</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-medium text-slate-600">Nguồn mặc định</label>
+                            <select x-model="importDefaultSource" class="w-full mt-1 px-2.5 py-1.5 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none">
+                                <option value="NQ57">NQ 57-NQ/TW</option>
+                                <option value="Bộ">Bộ giao</option>
+                                <option value="Tỉnh ủy">Tỉnh ủy giao</option>
+                                <option value="UBND">UBND tỉnh giao</option>
+                                <option value="Chuyên môn">Chuyên môn nội bộ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="importedTasks.length > 0" class="space-y-2 pt-2 border-t">
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="font-bold text-slate-800" x-text="'Đã trích xuất ' + importedTasks.length + ' nhiệm vụ:'"></span>
+                        <span class="text-emerald-600 font-semibold">✓ Thành công</span>
+                    </div>
+
+                    <div class="max-h-40 overflow-y-auto space-y-1.5 border rounded-lg p-2 bg-slate-50">
+                        <template x-for="(impTask, iIdx) in importedTasks" :key="iIdx">
+                            <div class="bg-white p-2 rounded border border-slate-200 shadow-sm space-y-1">
+                                <textarea x-model="impTask.content" rows="1" class="w-full p-1 border rounded text-[11px] font-medium text-slate-900 outline-none"></textarea>
+                                <div class="grid grid-cols-2 gap-1">
+                                    <select x-model="impTask.source" class="px-1.5 py-0.5 border rounded text-[10px] font-semibold">
+                                        <option value="NQ57">NQ 57</option>
+                                        <option value="Bộ">Bộ</option>
+                                        <option value="Tỉnh ủy">Tỉnh ủy</option>
+                                        <option value="UBND">UBND</option>
+                                        <option value="Chuyên môn">Chuyên môn</option>
+                                    </select>
+                                    <select x-model="impTask.status" class="px-1.5 py-0.5 border rounded text-[10px]">
+                                        <option>Đã hoàn thành - Đúng hạn</option>
+                                        <option>Đã hoàn thành - Trễ hạn</option>
+                                        <option>Đang thực hiện - Trễ hạn</option>
+                                        <option>Đang thực hiện - Chưa tới hạn</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 pt-1">
+                        <button @click="addTaskModal = false" class="px-3 py-1.5 border rounded-lg font-medium text-slate-600">Hủy</button>
+                        <button @click="confirmImportTasks()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-sm">Thêm vào Báo cáo</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div x-show="showToast" x-transition class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-3 text-sm" x-cloak>
-        <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <!-- ADD SCHEDULE MODAL -->
+    <div x-show="addScheduleModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+        <div class="bg-white rounded-xl max-w-md w-full p-5 shadow-xl space-y-3 text-xs">
+            <h3 class="font-bold text-slate-900 text-sm">Đăng Ký Lịch Công Tác Ban Giám Đốc</h3>
+            
+            <div class="space-y-2.5">
+                <div>
+                    <label class="font-medium text-slate-600">Thời gian</label>
+                    <input type="text" x-model="newSchedule.time" placeholder="Thứ Hai, 13/4/2026 - 07:00" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">Địa điểm</label>
+                    <input type="text" x-model="newSchedule.location" placeholder="Hội trường Sở (CS1)" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">Nội dung công việc</label>
+                    <textarea x-model="newSchedule.content" rows="2" placeholder="Nội dung chi tiết..." class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">BGĐ phụ trách</label>
+                    <select x-model="newSchedule.bgd" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option>BGĐ</option>
+                        <option>GĐ</option>
+                        <option>PGĐ Hải</option>
+                        <option>PGĐ Thúy</option>
+                        <option>PGĐ Khởi</option>
+                        <option>PGĐ Hiếu</option>
+                        <option>PGĐ Cường</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-medium text-slate-600">Phòng tham mưu</label>
+                    <input type="text" x-model="newSchedule.dept" placeholder="Phòng Khoa học" class="w-full mt-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button @click="addScheduleModal = false" class="px-3 py-1.5 border rounded-lg font-medium text-slate-600">Hủy</button>
+                <button @click="addSchedule()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm">Lưu lịch</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GOOGLE DRIVE FOLDER MODAL -->
+    <div x-show="driveModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+        <div class="bg-white rounded-xl max-w-md w-full p-5 shadow-xl space-y-4 text-xs">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-indigo-50 p-2 rounded-lg">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Thư mục Lưu trữ</h3>
+                        <p class="text-[10px] text-slate-500" x-text="'TK: ' + driveAccount"></p>
+                    </div>
+                </div>
+                <button @click="driveModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                <div class="font-semibold uppercase text-[10px] text-slate-500">Đường dẫn thư mục máy tính</div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" x-model="localFolderPath" @change="saveFolderPath()" class="w-full px-3 py-2 border rounded-lg font-mono text-[11px] text-indigo-900 bg-white shadow-sm outline-none">
+                    <button @click="pickFolder()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold px-3 py-2 rounded-lg transition shadow-sm whitespace-nowrap">Chọn...</button>
+                </div>
+                <input type="file" id="nativeFolderInput" webkitdirectory style="display: none;" @change="handleNativeFolderSelect($event)">
+                <div class="flex justify-between items-center text-[10px] text-slate-500 pt-0.5">
+                    <span>Lưu file báo cáo trực tiếp vào máy.</span>
+                    <button @click="saveFolderPath()" class="text-indigo-600 font-semibold hover:underline">Xác lập đường dẫn</button>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-1">
+                <button @click="driveModal = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium shadow-sm">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div x-show="showToastFlag" x-transition class="fixed bottom-4 right-4 bg-slate-900 text-white px-3.5 py-2.5 rounded-xl shadow-lg z-50 text-xs flex items-center space-x-2" x-cloak>
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         <span x-text="toastMessage"></span>
     </div>
 
-    <!-- Application Script -->
     <script>
-        function reportApp() {
-            return {
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
                 currentTab: 'dashboard',
-                openDriveModal: false,
-                addTaskModal: false,
-                isSyncing: false,
-                showToast: false,
+                subTab: 'tasks',
                 toastMessage: '',
-                driveAccount: 'vanthu@skhcn.tayninh.gov.vn',
-                driveFolder: 'Sở KH&CN Tây Ninh / Báo Cáo Tuần 2026',
-                autoSync: true,
-                config: {
-                    ngayBd: '2026-07-11',
-                    ngayKt: '2026-07-16',
-                    ngay: '17',
-                    thang: '07',
-                    nam: '2026',
-                    nguoiKy: 'Nguyễn Trung Hiếu'
-                },
-                finance: {
-                    vdtKh: 300000000,
-                    vdtGn: 0,
-                    get vdtTl() { return ((this.vdtGn / this.vdtKh) * 100).toFixed(1); },
-                    snDt: 160298527233,
-                    snGn: 23007408986,
-                    get snTl() { return ((this.snGn / this.snDt) * 100).toFixed(1); }
-                },
+                showToastFlag: false,
+                addTaskModal: false,
+                taskModalTab: 'manual',
+                addScheduleModal: false,
+                driveModal: false,
+                driveAccount: 'skhcn.tayninh@gmail.com',
+                localFolderPath: 'C:\\Users\\Public\\Documents\\Bao_Cao_Tuan_SKHCN',
                 newTask: {
-                    dept: 'Phòng Chuyển đổi số',
+                    dept: 'Phòng Khoa học',
                     content: '',
-                    source: 'UBND',
+                    source: 'NQ57',
                     status: 'Đã hoàn thành - Đúng hạn',
                     evidence: ''
                 },
+                importDefaultDept: 'Phòng Khoa học',
+                importDefaultSource: 'UBND',
+                importedTasks: [],
+                newSchedule: {
+                    time: 'Thứ Hai, ngày 13/4/2026 - 07:00',
+                    location: 'Hội trường Sở (CS1)',
+                    content: 'Chào cờ đầu tuần',
+                    bgd: 'BGĐ',
+                    dept: 'Tất cả CC, VC, NLĐ'
+                },
                 tasks: [
-                    { dept: 'Phòng Chuyển đổi số', content: 'Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ NQ 57.', source: 'NQ57', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Công văn số 123/SKHCN-CĐS' },
-                    { dept: 'Phòng Chuyển đổi số', content: 'Gửi văn bản góp ý Bộ KH&CN đối với dự thảo Quyết định Khung kiến trúc quốc gia số.', source: 'Bộ', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Tờ trình số 45/TTr-SKHCN' },
-                    { dept: 'Phòng KH & ĐMST', content: 'Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.', source: 'UBND', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Quyết định số 89/QĐ-UBND' },
-                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh ban hành Báo cáo kết quả chuyển đổi số 6 tháng đầu năm 2026.', source: 'UBND', status: 'Đã hoàn thành - Trễ hạn', evidence: 'Báo cáo số 12/BC-SKHCN' },
-                    { dept: 'Phòng TCĐLCL', content: 'Góp ý dự thảo Nghị quyết quy định mức chi xây dựng tiêu chuẩn cơ sở.', source: 'UBND', status: 'Đang thực hiện - Trễ hạn', evidence: 'Đang chờ ý kiến phối hợp' },
-                    { dept: 'Phòng Kế hoạch - Tài chính', content: 'Tham mưu gửi UBND tỉnh và Bộ KH&CN cung cấp thông tin tài chính NQ 57.', source: 'UBND', status: 'Đang thực hiện - Chưa tới hạn', evidence: 'Hạn nộp 30/07/2026' }
+                    { dept: 'Phòng Chuyển đổi số', content: 'Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện trên Hệ thống thông tin giám sát NQ 57-NQ/TW.', source: 'NQ57', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Công văn số 4231/SKHCN-CĐS ngày 09/4/2026' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Gửi văn bản góp ý Bộ KH&CN đối với dự thảo Quyết định ban hành Khung kiến trúc tổng thể quốc gia số (lần 2).', source: 'Bộ', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Công văn số 4266/SKHCN-CĐS ngày 10/4/2026' },
+                    { dept: 'Phòng Khoa học', content: 'Hoàn chỉnh phần mềm quản lý quy trình nhiệm vụ KH&CN trực tuyến.', source: 'UBND', status: 'Đã hoàn thành - Đúng hạn', evidence: 'CSDL KH&CN Tây Ninh' },
+                    { dept: 'Phòng Công nghệ & ĐMST', content: 'Xây dựng Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.', source: 'UBND', status: 'Đã hoàn thành - Trễ hạn', evidence: 'Kế hoạch số 3899/KH-SKHCN' },
+                    { dept: 'Phòng Công nghệ & ĐMST', content: 'Tham mưu UBND tỉnh gửi Bộ KH&CN văn bản góp ý hướng dẫn nội dung và biểu mẫu báo cáo quy hoạch.', source: 'UBND', status: 'Đang thực hiện - Trễ hạn', evidence: 'Đang rà soát bổ sung' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh ban hành Báo cáo kết quả chuyển đổi số tỉnh Tây Ninh 6 tháng đầu năm 2026.', source: 'UBND', status: 'Đang thực hiện - Chưa tới hạn', evidence: 'Đang thực hiện theo tiến độ' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh đề xuất đăng ký xây dựng Nghị quyết của HĐND tỉnh quy định chính sách thúc đẩy CĐS cho doanh nghiệp nhỏ và vừa.', source: 'UBND', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Tờ trình số 4323/TTr-SKHCN ngày 13/4/2026' },
+                    { dept: 'Phòng TCĐLCL', content: 'Góp ý dự thảo hồ sơ đăng ký xây dựng Nghị quyết quy định mức chi xây dựng tiêu chuẩn cơ sở.', source: 'UBND', status: 'Đang thực hiện - Chưa tới hạn', evidence: 'Đang lấy ý kiến các phòng ban' },
+                    { dept: 'Phòng Kế hoạch – Tài chính', content: 'Tham mưu UBND tỉnh và Bộ KHCN cung cấp thông tin, số liệu về tài chính phục vụ báo cáo Ban chỉ đạo Trung ương NQ 57.', source: 'UBND', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Báo cáo tài chính quý I/2026' },
+                    { dept: 'Phòng Kế hoạch – Tài chính', content: 'Tham mưu Quyết định phê duyệt hồ sơ mời thầu gói thầu: Dịch vụ tin nhắn SMS cho các hệ thống thông tin dùng chung.', source: 'UBND', status: 'Đang thực hiện - Trễ hạn', evidence: 'Đang trình thẩm định lại' }
                 ],
-                get computed() {
-                    const htList = this.tasks.filter(t => t.status && t.status.includes('Đã hoàn thành'));
-                    const khList = this.tasks.filter(t => t.status && t.status.includes('Đang thực hiện'));
-                    return {
-                        kqTong: htList.length,
-                        kqHt: htList.filter(t => t.status === 'Đã hoàn thành - Đúng hạn').length,
-                        kqNq57Tong: htList.filter(t => t.source === 'NQ57').length,
-                        kqNq57Ht: htList.filter(t => t.source === 'NQ57' && t.status.includes('Đã hoàn thành')).length,
-                        kqBoTong: htList.filter(t => t.source === 'Bộ').length,
-                        kqBoHt: htList.filter(t => t.source === 'Bộ' && t.status.includes('Đã hoàn thành')).length,
-                        kqTinhUyTong: htList.filter(t => t.source === 'Tỉnh ủy').length,
-                        kqTinhUyHt: htList.filter(t => t.source === 'Tỉnh ủy' && t.status.includes('Đã hoàn thành')).length,
-                        kqUbndTong: htList.filter(t => t.source === 'UBND').length,
-                        kqUbndHt: htList.filter(t => t.source === 'UBND' && t.status.includes('Đã hoàn thành')).length,
-                        kqChuyenMonTong: htList.filter(t => t.source === 'Chuyên môn').length,
-                        kqChuyenMonHt: htList.filter(t => t.source === 'Chuyên môn' && t.status.includes('Đã hoàn thành')).length,
-                        khTong: khList.length + 18,
-                        khSapHan: khList.filter(t => t.status === 'Đang thực hiện - Trễ hạn').length + 18,
-                        khChuaHan: khList.filter(t => t.status === 'Đang thực hiện - Chưa tới hạn').length
+                schedules: [
+                    { time: 'Thứ Hai, 13/4/2026 - 07:00', location: 'Hội trường Sở (CS1)', content: 'Chào cờ đầu tuần', bgd: 'BGĐ', dept: 'Tất cả CC, VC, NLĐ' },
+                    { time: 'Thứ Hai, 13/4/2026 - 13:30', location: 'Phòng họp trực tuyến UBND tỉnh', content: 'Họp Ban Thường vụ Đảng ủy Ủy ban nhân dân tỉnh', bgd: 'PGĐ Hải', dept: 'Văn phòng Sở' },
+                    { time: 'Thứ Ba, 14/4/2026 - 08:00', location: 'Phòng họp trực tuyến L3', content: 'Hội đồng tư vấn tuyển chọn nhiệm vụ KH&CN cấp tỉnh năm 2026 "Xây dựng mô hình canh tác cây đậu phộng bền vững"', bgd: 'PGĐ Thúy', dept: 'Phòng Khoa học' },
+                    { time: 'Thứ Tư, 15/4/2026 - 08:00', location: 'Phòng họp lầu 3', content: 'Họp giao ban tuần', bgd: 'BGĐ', dept: 'Trưởng các phòng, trung tâm' }
+                ],
+                taskFilter: { type: 'all', title: '' },
+                finance: { nsTl: 300000000, nsGn: 0, snTl: 160298527233, snGn: 23007408986 },
+                localFolderPath: localStorage.getItem('skhcn_folder_path') || 'C:\\Users\\Public\\Documents\\Bao_Cao_Tuan_SKHCN',
+                
+                get chartSegments() {
+                    const total = this.tasks.length || 1;
+                    let items = [
+                        { label: 'Hoàn thành - Đúng hạn', count: this.computed.completedOntime, color: '#10b981', filter: 'completed_ontime', badgeBg: 'bg-emerald-50/90', textCol: 'text-emerald-700', borderCol: 'border-emerald-200' },
+                        { label: 'Hoàn thành - Trễ hạn', count: this.computed.completedLate, color: '#f59e0b', filter: 'completed_late', badgeBg: 'bg-amber-50/90', textCol: 'text-amber-700', borderCol: 'border-amber-200' },
+                        { label: 'Đang thực hiện - Trễ hạn', count: this.computed.inProgressLate, color: '#ef4444', filter: 'inprogress_late', badgeBg: 'bg-red-50/90', textCol: 'text-red-700', borderCol: 'border-red-200' },
+                        { label: 'Đang thực hiện - Chưa tới hạn', count: this.computed.inProgressNotDue, color: '#3b82f6', filter: 'inprogress_notdue', badgeBg: 'bg-blue-50/90', textCol: 'text-blue-700', borderCol: 'border-blue-200' }
+                    ];
+                    let accumulatedPercent = 0;
+                    return items.map(item => {
+                        const percent = (item.count / total) * 100;
+                        const dashArray = `${percent} ${100 - percent}`;
+                        const dashOffset = -accumulatedPercent;
+                        accumulatedPercent += percent;
+                        return { ...item, percent, dashArray, dashOffset };
+                    });
+                },
+
+                get chartSvgHtml() {
+                    const total = this.tasks.length || 1;
+                    let items = [
+                        { count: this.computed.completedOntime, color: '#10b981' },
+                        { count: this.computed.completedLate, color: '#f59e0b' },
+                        { count: this.computed.inProgressLate, color: '#ef4444' },
+                        { count: this.computed.inProgressNotDue, color: '#3b82f6' }
+                    ];
+                    let accumulatedPercent = 0;
+                    let svgContent = `<circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="5.5"></circle>`;
+                    
+                    items.forEach(item => {
+                        const percent = (item.count / total) * 100;
+                        const dashArray = `${percent} ${100 - percent}`;
+                        const dashOffset = -accumulatedPercent;
+                        
+                        svgContent += `<circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="${item.color}" stroke-width="5.5" stroke-dasharray="${dashArray}" stroke-dashoffset="${dashOffset}"></circle>`;
+                        
+                        // Render percentage text inside the donut ring if segment is large enough (>= 5%)
+                        if (percent >= 5) {
+                            const midPercent = accumulatedPercent + percent / 2;
+                            const angle = (midPercent / 100) * 2 * Math.PI - Math.PI / 2;
+                            const radius = 11.5;
+                            const x = 21 + radius * Math.cos(angle);
+                            const y = 21 + radius * Math.sin(angle);
+                            svgContent += `<text x="${x}" y="${y}" fill="#ffffff" font-size="2.4" font-weight="bold" text-anchor="middle" dominant-baseline="central" transform="rotate(90 ${x} ${y})">${percent.toFixed(0)}%</text>`;
+                        }
+                        
+                        accumulatedPercent += percent;
+                    });
+                    return svgContent;
+                },
+
+                showToast(msg) {
+                    this.toastMessage = msg;
+                    this.showToastFlag = true;
+                    setTimeout(() => { this.showToastFlag = false; }, 3000);
+                },
+                async pickFolder() {
+                    if (window.showDirectoryPicker) {
+                        try {
+                            const handle = await window.showDirectoryPicker();
+                            this.localFolderPath = 'C:\\LocalFolders\\' + handle.name;
+                            localStorage.setItem('skhcn_folder_path', this.localFolderPath);
+                            this.showToast('Đã xác lập thư mục: ' + handle.name);
+                            return;
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                document.getElementById('nativeFolderInput').click();
+                            }
+                            return;
+                        }
                     }
+                    document.getElementById('nativeFolderInput').click();
+                },
+                handleNativeFolderSelect(event) {
+                    const files = event.target.files;
+                    if (files && files.length > 0) {
+                        const rel = files[0].webkitRelativePath.split('/');
+                        const folderName = rel.length > 1 ? rel[0] : 'Thu_Muc_Da_Chon';
+                        this.localFolderPath = 'C:\\LocalPC\\' + folderName;
+                        localStorage.setItem('skhcn_folder_path', this.localFolderPath);
+                        this.showToast('Đã xác lập thư mục lưu trữ thành công!');
+                    }
+                    event.target.value = '';
+                },
+                saveFolderPath() {
+                    localStorage.setItem('skhcn_folder_path', this.localFolderPath);
+                    this.showToast('Đã lưu đường dẫn thư mục thành công!');
                 },
                 addTask() {
-                    if(!this.newTask.content) return;
-                    this.tasks.push({...this.newTask});
+                    if (!this.newTask.content.trim()) {
+                        this.showToast('Vui lòng nhập nội dung nhiệm vụ!');
+                        return;
+                    }
+                    this.tasks.push({ ...this.newTask });
                     this.newTask.content = '';
                     this.newTask.evidence = '';
                     this.addTaskModal = false;
-                    this.triggerToast('Đã thêm nhiệm vụ thành công!');
+                    this.showToast('Đã thêm nhiệm vụ mới thành công!');
+                },
+                parseWordFile(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const text = e.target.result;
+                        let lines = text.split(/\r?\n/).filter(l => l.trim().length > 10);
+                        if (lines.length === 0) lines = [text];
+                        this.importedTasks = lines.map(line => {
+                            let cleanText = line.replace(/^[\*\-\•\d+\.\)]\s*/, '').trim();
+                            let detected = this.importDefaultSource;
+                            const lower = cleanText.toLowerCase();
+                            if (lower.includes('nq 57') || lower.includes('57-nq/tw')) detected = 'NQ57';
+                            else if (lower.includes('bộ') || lower.includes('trung ương')) detected = 'Bộ';
+                            else if (lower.includes('tỉnh ủy')) detected = 'Tỉnh ủy';
+                            else if (lower.includes('ubnd')) detected = 'UBND';
+                            return {
+                                dept: this.importDefaultDept,
+                                content: cleanText,
+                                source: detected,
+                                status: 'Đã hoàn thành - Đúng hạn',
+                                evidence: 'Trích xuất từ: ' + file.name
+                            };
+                        });
+                        this.showToast('Đã trích xuất ' + this.importedTasks.length + ' nhiệm vụ!');
+                    };
+                    reader.readAsText(file, 'UTF-8');
+                },
+                confirmImportTasks() {
+                    if (this.importedTasks.length === 0) return;
+                    this.tasks.push(...this.importedTasks);
+                    this.importedTasks = [];
+                    this.addTaskModal = false;
+                    this.showToast('Đã nhập thành công vào báo cáo!');
                 },
                 removeTask(index) {
                     this.tasks.splice(index, 1);
-                    this.triggerToast('Đã xóa nhiệm vụ.');
+                    this.showToast('Đã xóa nhiệm vụ.');
                 },
-                saveDriveConfig() {
-                    this.openDriveModal = false;
-                    this.triggerToast('Đã lưu cấu hình Google Drive thành công (' + this.driveAccount + ')!');
+                addSchedule() {
+                    if (!this.newSchedule.content.trim()) {
+                        this.showToast('Vui lòng nhập nội dung công việc!');
+                        return;
+                    }
+                    this.schedules.push({ ...this.newSchedule });
+                    this.newSchedule.content = '';
+                    this.addScheduleModal = false;
+                    this.showToast('Đã đăng ký lịch thành công!');
                 },
-                triggerToast(msg) {
-                    this.toastMessage = msg;
-                    this.showToast = true;
-                    setTimeout(() => {
-                        this.showToast = false;
-                    }, 3000);
+                removeSchedule(index) {
+                    this.schedules.splice(index, 1);
+                    this.showToast('Đã xóa lịch.');
                 },
-                formatDate(dateStr) {
-                    if(!dateStr) return '';
-                    const parts = dateStr.split('-');
-                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                filterTasks(type, title) {
+                    this.taskFilter.type = type;
+                    this.taskFilter.title = title;
+                    this.currentTab = 'departments';
+                    this.subTab = 'tasks';
                 },
-                formatMoney(amount) {
-                    return new Intl.NumberFormat('vi-VN').format(amount);
+                filterTasksStatus(source, status, title) {
+                    this.taskFilter.type = 'source_status';
+                    this.taskFilter.source = source;
+                    this.taskFilter.status = status;
+                    this.taskFilter.title = title;
+                    this.currentTab = 'departments';
+                    this.subTab = 'tasks';
                 },
-                exportWord() {
-                    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Báo cáo tuần</title></head><body>";
-                    const footer = "</body></html>";
-                    const html = header + document.getElementById('reportPreview').innerHTML + footer;
-                    const blob = new Blob(['\ufeff' + html], {
-                        type: 'application/msword'
+                clearFilter() {
+                    this.taskFilter.type = 'all';
+                    this.taskFilter.title = '';
+                },
+                get filteredTasks() {
+                    if (!this.taskFilter.type || this.taskFilter.type === 'all') return this.tasks;
+                    if (this.taskFilter.type === 'source_status') {
+                        return this.tasks.filter(t => t.source === this.taskFilter.source && t.status === this.taskFilter.status);
+                    }
+                    return this.tasks.filter(t => {
+                        if (this.taskFilter.type === 'completed_ontime') return t.status === 'Đã hoàn thành - Đúng hạn';
+                        if (this.taskFilter.type === 'completed_late') return t.status === 'Đã hoàn thành - Trễ hạn';
+                        if (this.taskFilter.type === 'inprogress_late') return t.status === 'Đang thực hiện - Trễ hạn';
+                        if (this.taskFilter.type === 'inprogress_notdue') return t.status === 'Đang thực hiện - Chưa tới hạn';
+                        if (this.taskFilter.type === 'source_nq57') return t.source === 'NQ57';
+                        if (this.taskFilter.type === 'source_bo') return t.source === 'Bộ';
+                        if (this.taskFilter.type === 'source_tinhuy') return t.source === 'Tỉnh ủy';
+                        if (this.taskFilter.type === 'source_ubnd') return t.source === 'UBND';
+                        if (this.taskFilter.type === 'source_chuyenmon') return t.source === 'Chuyên môn';
+                        return true;
                     });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Bao_Cao_Tuan_SKHCN_TayNinh_${this.config.ngay}_${this.config.thang}_${this.config.nam}.doc`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    this.triggerToast('Đã tải xuống file Word báo cáo!');
                 },
-                syncToDrive() {
-                    this.isSyncing = true;
-                    setTimeout(() => {
-                        this.isSyncing = false;
-                        this.triggerToast('Đã đồng bộ file Word thành công lên Google Drive tại thư mục: ' + this.driveFolder);
-                    }, 1500);
+                get computed() {
+                    return {
+                        completedOntime: this.tasks.filter(t => t.status === 'Đã hoàn thành - Đúng hạn').length,
+                        completedLate: this.tasks.filter(t => t.status === 'Đã hoàn thành - Trễ hạn').length,
+                        inProgressLate: this.tasks.filter(t => t.status === 'Đang thực hiện - Trễ hạn').length,
+                        inProgressNotDue: this.tasks.filter(t => t.status === 'Đang thựcين - Chưa tới hạn' || t.status === 'Đang thực hiện - Chưa tới hạn').length,
+                        kqNq57Tong: this.tasks.filter(t => t.source === 'NQ57').length,
+                        kqNq57Ht: this.tasks.filter(t => t.source === 'NQ57' && t.status.includes('Đã hoàn thành')).length,
+                        kqBoTong: this.tasks.filter(t => t.source === 'Bộ').length,
+                        kqBoHt: this.tasks.filter(t => t.source === 'Bộ' && t.status.includes('Đã hoàn thành')).length,
+                        kqTinhUyTong: this.tasks.filter(t => t.source === 'Tỉnh ủy').length,
+                        kqTinhUyHt: this.tasks.filter(t => t.source === 'Tỉnh ủy' && t.status.includes('Đã hoàn thành')).length,
+                        kqUbndTong: this.tasks.filter(t => t.source === 'UBND').length,
+                        kqUbndHt: this.tasks.filter(t => t.source === 'UBND' && t.status.includes('Đã hoàn thành')).length,
+                        kqChuyenMonTong: this.tasks.filter(t => t.source === 'Chuyên môn').length,
+                        kqChuyenMonHt: this.tasks.filter(t => t.source === 'Chuyên môn' && t.status.includes('Đã hoàn thành')).length
+                    };
+                },
+                formatMoney(val) {
+                    return new Intl.NumberFormat('vi-VN').format(val || 0);
                 }
-            }
-        }
+            }));
+        });
     </script>
 </body>
 </html>
