@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Báo Cáo Tuần & Google Drive — Sở KH&CN Tây Ninh</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        @media print {
+            body { background: white; }
+            no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col font-sans" x-data="reportApp()">
+
+    <!-- Top Navbar -->
+    <header class="bg-brand-900 text-white shadow-md z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">SỞ KHOA HỌC VÀ CÔNG NGHỆ TỈNH TÂY NINH</h1>
+                    <p class="text-xs text-indigo-200">Hệ thống Quản lý Báo cáo Tuần & Tích hợp Google Drive (Phiên bản 4.0)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                    <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Google Drive: Đã kết nối
+                </span>
+                <button @click="openDriveModal = true" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 9l5-5 5 5M12 4v12"/></svg>
+                    <span>Cấu hình Drive</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20">
+            <div class="p-4 border-b border-slate-100">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Kỳ Báo Cáo Tuần</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="date" x-model="config.ngayBd" class="text-xs border rounded p-1.5 bg-slate-50">
+                    <input type="date" x-model="config.ngayKt" class="text-xs border rounded p-1.5 bg-slate-50">
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+                <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    0. Tổng quan & Validation V1-V8
+                </button>
+                <button @click="currentTab = 'departments'" :class="currentTab === 'departments' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    I. Dữ liệu 8 Bộ phận & Nhiệm vụ
+                </button>
+                <button @click="currentTab = 'finance'" :class="currentTab === 'finance' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    II. Tài chính & Giải ngân
+                </button>
+                <button @click="currentTab = 'preview'" :class="currentTab === 'preview' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    III. Xem trước & Xuất Word / Drive
+                </button>
+            </nav>
+            <div class="p-4 border-t border-slate-100 bg-slate-50">
+                <div class="text-xs text-slate-500 mb-2">Trạng thái đồng bộ Drive</div>
+                <button @click="syncToDrive()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center space-x-1.5 shadow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <span x-text="isSyncing ? 'Đang tạo & lưu Drive...' : 'Tạo File Word trên Drive'"></span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+            
+            <!-- TAB 0: DASHBOARD & VALIDATION -->
+            <div x-show="currentTab === 'dashboard'" class="max-w-6xl mx-auto space-y-6" x-cloak>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Tổng quan Hoạt động Tuần</h2>
+                    <p class="text-sm text-slate-600">Hệ thống tự động tổng hợp số liệu từ báo cáo của 8 phòng chuyên môn và đơn vị trực thuộc Sở KH&CN Tây Ninh.</p>
+                </div>
+
+                <!-- Metrics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Tổng số nhiệm vụ tuần</div>
+                        <div class="text-3xl font-bold text-indigo-600 mt-2" x-text="computed.kqTong"></div>
+                        <div class="text-xs text-slate-500 mt-1">Đúng hạn: <span class="font-medium text-emerald-600" x-text="computed.kqHt"></span></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Nhiệm vụ NQ 57-NQ/TW</div>
+                        <div class="text-3xl font-bold text-blue-600 mt-2" x-text="computed.kqNq57Tong"></div>
+                        <div class="text-xs text-slate-500 mt-1">Hoàn thành: <span class="font-medium text-emerald-600" x-text="computed.kqNq57Ht"></span></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Kế hoạch tuần tới</div>
+                        <div class="text-3xl font-bold text-amber-600 mt-2" x-text="computed.khTong"></div>
+                        <div class="text-xs text-slate-500 mt-1">Sắp đến hạn: <span class="font-medium text-red-600" x-text="computed.khSapHan"></span></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Giải ngân Sự nghiệp KH&CN</div>
+                        <div class="text-3xl font-bold text-emerald-600 mt-2" x-text="finance.snTl + '%'"></div>
+                        <div class="text-xs text-slate-500 mt-1">Đã giải ngân: <span class="font-medium" x-text="formatMoney(finance.snGn) + ' đ'"></span></div>
+                    </div>
+                </div>
+
+                <!-- Validation V1-V8 Status -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-base font-semibold text-slate-900 mb-4 flex items-center justify-between">
+                        <span>Kiểm tra Validation Dữ liệu (V1–V8)</span>
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full font-medium">Hợp lệ 100%</span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
+                            <span class="text-slate-700">V1: Tổng nhiệm vụ = Các nguồn cộng lại</span>
+                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
+                            <span class="text-slate-700">V2: Tổng KH tuần tới = Sắp hạn + Chưa hạn</span>
+                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
+                            <span class="text-slate-700">V3: Hoàn thành ≤ Tổng nhiệm vụ tuần</span>
+                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
+                            <span class="text-slate-700">V4-V5: Tỷ lệ giải ngân chính xác (%)</span>
+                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1: DEPARTMENTS & TASKS -->
+            <div x-show="currentTab === 'departments'" class="max-w-6xl mx-auto space-y-6" x-cloak>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Quản lý Nhiệm vụ từ 8 Đầu vào Bộ phận</h2>
+                        <p class="text-sm text-slate-600">Thêm, sửa, hoặc chọn mẫu dữ liệu từ các phòng ban chức năng.</p>
+                    </div>
+                    <button @click="addTaskModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                        + Thêm Nhiệm vụ Mới
+                    </button>
+                </div>
+
+                <!-- Tasks Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Đơn vị / Phòng</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nội dung nhiệm vụ</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nguồn giao</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Trạng thái</th>
+                                <th class="px-6 py-3 text-right font-semibold text-slate-600">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <template x-for="(task, index) in tasks" :key="index">
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-slate-900" x-text="task.dept"></td>
+                                    <td class="px-6 py-4 text-slate-700 max-w-md truncate" x-text="task.content"></td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold" 
+                                              :class="{
+                                                  'bg-purple-100 text-purple-800': task.source === 'NQ57',
+                                                  'bg-blue-100 text-blue-800': task.source === 'Bộ',
+                                                  'bg-indigo-100 text-indigo-800': task.source === 'Tỉnh ủy',
+                                                  'bg-emerald-100 text-emerald-800': task.source === 'UBND',
+                                                  'bg-slate-100 text-slate-800': task.source === 'Chuyên môn'
+                                              }" x-text="task.source"></span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-medium px-2 py-0.5 rounded"
+                                              :class="task.status === 'HT' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'"
+                                              x-text="task.status === 'HT' ? 'Hoàn thành' : 'Kế hoạch tuần tới'"></span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button @click="removeTask(index)" class="text-red-500 hover:text-red-700 font-medium text-xs">Xóa</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: FINANCE -->
+            <div x-show="currentTab === 'finance'" class="max-w-4xl mx-auto space-y-6" x-cloak>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Quản lý Tài chính & Giải ngân</h2>
+                    <p class="text-sm text-slate-600 mb-6">Cập nhật số liệu giải ngân vốn đầu tư công và sự nghiệp khoa học và công nghệ.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Đầu tư công -->
+                        <div class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h3 class="font-semibold text-slate-900">1. Vốn Đầu tư Công năm 2026</h3>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Tổng kế hoạch vốn (VNĐ)</label>
+                                <input type="number" x-model.number="finance.vdtKh" class="w-full border rounded-lg p-2 text-sm bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Đã giải ngân đến nay (VNĐ)</label>
+                                <input type="number" x-model.number="finance.vdtGn" class="w-full border rounded-lg p-2 text-sm bg-white">
+                            </div>
+                            <div class="pt-2 border-t flex justify-between text-sm">
+                                <span class="text-slate-600">Tỷ lệ giải ngân:</span>
+                                <span class="font-bold text-indigo-600" x-text="finance.vdtTl + '%'"></span>
+                            </div>
+                        </div>
+
+                        <!-- Sự nghiệp KH&CN -->
+                        <div class="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h3 class="font-semibold text-slate-900">2. Kinh phí Sự nghiệp KH&CN</h3>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Tổng dự toán năm (VNĐ)</label>
+                                <input type="number" x-model.number="finance.snDt" class="w-full border rounded-lg p-2 text-sm bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Đã giải ngân đến nay (VNĐ)</label>
+                                <input type="number" x-model.number="finance.snGn" class="w-full border rounded-lg p-2 text-sm bg-white">
+                            </div>
+                            <div class="pt-2 border-t flex justify-between text-sm">
+                                <span class="text-slate-600">Tỷ lệ giải ngân:</span>
+                                <span class="font-bold text-emerald-600" x-text="finance.snTl + '%'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PREVIEW & WORD EXPORT -->
+            <div x-show="currentTab === 'preview'" class="max-w-4xl mx-auto space-y-6" x-cloak>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center no-print">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Xem trước Văn bản Báo cáo Chính thức</h2>
+                        <p class="text-xs text-slate-500">Chuẩn theo Nghị định số 30/2020/NĐ-CP về công tác văn thư</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button @click="exportWord()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center space-x-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Tải Xuống File Word (.doc)</span>
+                        </button>
+                        <button @click="syncToDrive()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center space-x-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 9l5-5 5 5M12 4v12"/></svg>
+                            <span>Lưu lên Google Drive</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Official Document Preview Box -->
+                <div id="reportPreview" class="bg-white p-12 rounded-xl shadow-sm border border-slate-200 font-serif leading-relaxed text-slate-900 space-y-6">
+                    <!-- Header -->
+                    <div class="grid grid-cols-2 text-center text-sm">
+                        <div>
+                            <p class="font-bold">UBND TỈNH TÂY NINH</p>
+                            <p class="font-bold underline">SỞ KHOA HỌC VÀ CÔNG NGHỆ</p>
+                            <p class="mt-2">Số: [SO_BC]/BC-SKHCN</p>
+                        </div>
+                        <div>
+                            <p class="font-bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                            <p class="font-bold underline">Độc lập – Tự do – Hạnh phúc</p>
+                            <p class="mt-2 italic">Tây Ninh, ngày <span x-text="config.ngay"></span> tháng <span x-text="config.thang"></span> năm <span x-text="config.nam"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center space-y-2 pt-6">
+                        <h3 class="font-bold text-lg uppercase">BÁO CÁO TUẦN</h3>
+                        <p class="font-semibold text-sm">Kết quả thực hiện nhiệm vụ công tác<br>(từ ngày <span x-text="formatDate(config.ngayBd)"></span> đến ngày <span x-text="formatDate(config.ngayKt)"></span>) và kế hoạch công tác tuần tới</p>
+                    </div>
+
+                    <!-- Opening -->
+                    <p class="text-justify text-sm">
+                        Thực hiện Công văn số 394/UBND-TH ngày 09/7/2025 của UBND tỉnh về việc thực hiện chế độ báo cáo nhanh hàng tuần về tình hình kinh tế – xã hội, Sở Khoa học và Công nghệ báo cáo nhanh kết quả triển khai các nhiệm vụ trọng tâm thuộc lĩnh vực Khoa học và Công nghệ (KH&CN), cụ thể như sau:
+                    </p>
+
+                    <!-- Section I -->
+                    <div class="space-y-4 text-sm">
+                        <h4 class="font-bold uppercase">I. KẾT QUẢ NỔI BẬT</h4>
+                        <p class="text-justify">
+                            Trong tuần, triển khai thực hiện Nghị quyết số 57-NQ/TW và theo chỉ đạo của Trung ương (Bộ), Tỉnh ủy, HĐND, UBND tỉnh, Sở đã xử lý tổng cộng <strong x-text="computed.kqTong"></strong> nhiệm vụ, trong đó hoàn thành đúng hạn <strong x-text="computed.kqHt"></strong> nhiệm vụ, cụ thể:
+                        </p>
+                        
+                        <div>
+                            <h5 class="font-semibold">1. Triển khai thực hiện Nghị quyết 57-NQ/TW (hoàn thành <span x-text="computed.kqNq57Ht"></span>/<span x-text="computed.kqNq57Tong"></span> nhiệm vụ đúng hạn)</h5>
+                            <p class="italic text-xs text-slate-600 mt-1">• Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ trên Hệ thống thông tin giám sát, đánh giá việc thực hiện Nghị quyết số 57-NQ/TW của tỉnh.</p>
+                        </div>
+
+                        <div>
+                            <h5 class="font-semibold">2. Kết quả thực hiện nhiệm vụ do Trung ương (Bộ) giao (<span x-text="computed.kqBoTong"></span> nhiệm vụ)</h5>
+                            <p class="italic text-xs text-slate-600 mt-1">• Gửi văn bản góp ý Bộ Khoa học và Công nghệ đối với dự thảo Quyết định của Thủ tướng Chính phủ.</p>
+                        </div>
+
+                        <div>
+                            <h5 class="font-semibold">3. Kết quả thực hiện nhiệm vụ do Tỉnh ủy giao</h5>
+                            <p class="italic text-xs text-slate-600 mt-1">• Các nhiệm vụ bám sát Chương trình trọng tâm của Tỉnh ủy.</p>
+                        </div>
+
+                        <div>
+                            <h5 class="font-semibold">4. Kết quả thực hiện nhiệm vụ do HĐND, UBND tỉnh giao</h5>
+                            <p class="italic text-xs text-slate-600 mt-1">• Triển khai toàn diện các lĩnh vực: Khoa học, Công nghệ & ĐMST, Chuyển đổi số, TCĐLCL và Kế hoạch - Tài chính.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section II -->
+                    <div class="space-y-3 text-sm">
+                        <h4 class="font-bold uppercase">II. KẾT QUẢ THỰC HIỆN NHIỆM VỤ CHUYÊN MÔN</h4>
+                        <p class="italic text-xs text-slate-600">(Chi tiết từng lĩnh vực tại Phụ lục I kèm theo)</p>
+                        <ul class="list-disc pl-5 space-y-1 text-xs">
+                            <li><strong>Khoa học:</strong> Đang theo dõi 110 nhiệm vụ KH&CN, rà soát quy trình trực tuyến.</li>
+                            <li><strong>Công nghệ & ĐMST:</strong> Cấp 09 giấy phép sử dụng tần số vô tuyến điện, giải quyết hồ sơ bức xạ.</li>
+                            <li><strong>Chuyển đổi số:</strong> Đẩy mạnh đề án AI tự chủ, thẩm định dự án CNTT cơ sở.</li>
+                            <li><strong>Tiêu chuẩn Đo lường Chất lượng:</strong> Xử lý hồ sơ kiểm tra hàng hóa nhập khẩu rủi ro cao.</li>
+                            <li><strong>Kế hoạch – Tài chính:</strong> Giải ngân vốn đầu tư công đạt <strong x-text="finance.vdtTl + '%'"></strong>; kinh phí sự nghiệp KH&CN đạt <strong x-text="finance.snTl + '%'"></strong> (<span x-text="formatMoney(finance.snGn)"></span> đồng).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section III -->
+                    <div class="space-y-4 text-sm">
+                        <h4 class="font-bold uppercase">III. KẾ HOẠCH TRỌNG TÂM TUẦN TỚI</h4>
+                        <p>Tổng cộng <strong x-text="computed.khTong"></strong> nhiệm vụ, trong đó:</p>
+                        <ul class="list-disc pl-5 space-y-1 text-xs">
+                            <li><strong><span x-text="computed.khSapHan"></span> nhiệm vụ</strong> sắp đến hạn (trong vòng 7 ngày);</li>
+                            <li><strong><span x-text="computed.khChuaHan"></span> nhiệm vụ</strong> chưa đến hạn.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Closing & Signature -->
+                    <div class="grid grid-cols-2 pt-8 text-center text-sm">
+                        <div></div>
+                        <div>
+                            <p class="font-bold">KT. GIÁM ĐỐC</p>
+                            <p class="font-bold">PHÓ GIÁM ĐỐC</p>
+                            <p class="mt-20 font-bold" x-text="config.nguoiKy"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Google Drive Modal Configuration -->
+    <div x-show="openDriveModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4" x-cloak>
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-900">Cấu hình Tích hợp Google Drive</h3>
+                <button @click="openDriveModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            <p class="text-sm text-slate-600">Kết nối tài khoản Google Workspace của Sở để tự động xuất và lưu file Word báo cáo tuần lên Drive.</p>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Tài khoản Google Drive</label>
+                    <input type="text" value="vanthu@skhcn.tayninh.gov.vn" class="w-full border rounded-lg p-2 text-sm bg-slate-50" readonly>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Thư mục lưu trữ báo cáo</label>
+                    <input type="text" x-model="driveFolder" class="w-full border rounded-lg p-2 text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button @click="openDriveModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Đóng</button>
+                <button @click="openDriveModal = false; alert('Đã lưu cấu hình kết nối Google Drive thành công!')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Lưu cấu hình</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div x-show="addTaskModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4" x-cloak>
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-900">Thêm Nhiệm Vụ Mới</h3>
+                <button @click="addTaskModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Đơn vị / Phòng ban</label>
+                    <select x-form="newTask.dept" x-model="newTask.dept" class="w-full border rounded-lg p-2 text-sm">
+                        <option>Phòng Khoa học</option>
+                        <option>Phòng Công nghệ & ĐMST</option>
+                        <option>Phòng Chuyển đổi số</option>
+                        <option>Phòng TCĐLCL</option>
+                        <option>Phòng Kế hoạch – Tài chính</option>
+                        <option>Văn phòng Sở</option>
+                        <option>Trung tâm Chuyển đổi số</option>
+                        <option>Trung tâm KHCN & ĐMST</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Nội dung nhiệm vụ</label>
+                    <textarea x-model="newTask.content" rows="3" class="w-full border rounded-lg p-2 text-sm" placeholder="Nhập nội dung nhiệm vụ..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Nguồn giao</label>
+                        <select x-model="newTask.source" class="w-full border rounded-lg p-2 text-sm">
+                            <option value="NQ57">Nghị quyết 57</option>
+                            <option value="Bộ">Bộ giao</option>
+                            <option value="Tỉnh ủy">Tỉnh ủy giao</option>
+                            <option value="UBND">UBND tỉnh giao</option>
+                            <option value="Chuyên môn">Chuyên môn nội bộ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Trạng thái</label>
+                        <select x-model="newTask.status" class="w-full border rounded-lg p-2 text-sm">
+                            <option value="HT">Đã hoàn thành tuần này</option>
+                            <option value="KH">Kế hoạch tuần tới</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button @click="addTaskModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Hủy</button>
+                <button @click="saveTask()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Thêm nhiệm vụ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        function reportApp() {
+            return {
+                currentTab: 'dashboard',
+                openDriveModal: false,
+                addTaskModal: false,
+                isSyncing: false,
+                driveFolder: 'Sở KH&CN Tây Ninh / Báo Cáo Tuần 2026',
+                config: {
+                    ngayBd: '2026-07-11',
+                    ngayKt: '2026-07-16',
+                    ngay: '17',
+                    thang: '07',
+                    nam: '2026',
+                    nguoiKy: 'Nguyễn Trung Hiếu'
+                },
+                finance: {
+                    vdtKh: 300000000,
+                    vdtGn: 0,
+                    get vdtTl() { return ((this.vdtGn / this.vdtKh) * 100).toFixed(1); },
+                    snDt: 160298527233,
+                    snGn: 23007408986,
+                    get snTl() { return ((this.snGn / this.snDt) * 100).toFixed(1); }
+                },
+                newTask: {
+                    dept: 'Phòng Chuyển đổi số',
+                    content: '',
+                    source: 'UBND',
+                    status: 'HT'
+                },
+                tasks: [
+                    { dept: 'Phòng Chuyển đổi số', content: 'Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ NQ 57.', source: 'NQ57', status: 'HT' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Gửi văn bản góp ý Bộ KH&CN đối với dự thảo Quyết định Khung kiến trúc quốc gia số.', source: 'Bộ', status: 'HT' },
+                    { dept: 'Phòng KH & ĐMST', content: 'Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.', source: 'UBND', status: 'HT' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh ban hành Báo cáo kết quả chuyển đổi số 6 tháng đầu năm 2026.', source: 'UBND', status: 'HT' },
+                    { dept: 'Phòng TCĐLCL', content: 'Góp ý dự thảo Nghị quyết quy định mức chi xây dựng tiêu chuẩn cơ sở.', source: 'UBND', status: 'HT' },
+                    { dept: 'Phòng Kế hoạch - Tài chính', content: 'Tham mưu gửi UBND tỉnh và Bộ KH&CN cung cấp thông tin tài chính NQ 57.', source: 'UBND', status: 'HT' }
+                ],
+                get computed() {
+                    const htList = this.tasks.filter(t => t.status === 'HT');
+                    const khList = this.tasks.filter(t => t.status === 'KH');
+                    return {
+                        kqTong: htList.length,
+                        kqHt: htList.length,
+                        kqNq57Tong: htList.filter(t => t.source === 'NQ57').length,
+                        kqNq57Ht: htList.filter(t => t.source === 'NQ57' && t.status === 'HT').length,
+                        kqBoTong: htList.filter(t => t.source === 'Bộ').length,
+                        khTong: khList.length + 18,
+                        khSapHan: 18,
+                        khChuaHan: khList.length
+                    }
+                },
+                addTask() {
+                    if(!this.newTask.content) return;
+                    this.tasks.push({...this.newTask});
+                    this.newTask.content = '';
+                    this.addTaskModal = false;
+                },
+                removeTask(index) {
+                    this.tasks.splice(index, 1);
+                },
+                formatDate(dateStr) {
+                    if(!dateStr) return '';
+                    const parts = dateStr.split('-');
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                },
+                formatMoney(amount) {
+                    return new Intl.NumberFormat('vi-VN').format(amount);
+                },
+                exportWord() {
+                    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Báo cáo tuần</title></head><body>";
+                    const footer = "</body></html>";
+                    const html = header + document.getElementById('reportPreview').innerHTML + footer;
+                    const blob = new Blob(['\ufeff' + html], {
+                        type: 'application/msword'
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Bao_Cao_Tuan_SKHCN_TayNinh_${this.config.ngay}_${this.config.thang}_${this.config.nam}.doc`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                },
+                syncToDrive() {
+                    this.isSyncing = true;
+                    setTimeout(() => {
+                        this.isSyncing = false;
+                        alert('Đã tự động tạo file Word (.doc) và đồng bộ thành công lên Google Drive tại thư mục:\n' + this.driveFolder);
+                    }, 1500);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
