@@ -55,7 +55,7 @@
             </div>
             <div class="flex items-center space-x-3">
                 <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                    <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Google Drive: Đã kết nối
+                    <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> <span x-text="'Drive: ' + driveAccount"></span>
                 </span>
                 <button @click="openDriveModal = true" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 9l5-5 5 5M12 4v12"/></svg>
@@ -80,7 +80,7 @@
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
                 <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    0. Tổng quan & Validation V1-V8
+                    0. Tổng quan hệ thống
                 </button>
                 <button @click="currentTab = 'departments'" :class="currentTab === 'departments' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'" class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm transition">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -107,7 +107,7 @@
         <!-- Content Area -->
         <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
             
-            <!-- TAB 0: DASHBOARD & VALIDATION -->
+            <!-- TAB 0: DASHBOARD -->
             <div x-show="currentTab === 'dashboard'" class="max-w-6xl mx-auto space-y-6" x-cloak>
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <h2 class="text-xl font-bold text-slate-900 mb-2">Tổng quan Hoạt động Tuần</h2>
@@ -115,16 +115,11 @@
                 </div>
 
                 <!-- Metrics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                         <div class="text-xs font-semibold text-slate-500 uppercase">Tổng số nhiệm vụ tuần</div>
                         <div class="text-3xl font-bold text-indigo-600 mt-2" x-text="computed.kqTong"></div>
                         <div class="text-xs text-slate-500 mt-1">Đúng hạn: <span class="font-medium text-emerald-600" x-text="computed.kqHt"></span></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase">Nhiệm vụ NQ 57-NQ/TW</div>
-                        <div class="text-3xl font-bold text-blue-600 mt-2" x-text="computed.kqNq57Tong"></div>
-                        <div class="text-xs text-slate-500 mt-1">Hoàn thành: <span class="font-medium text-emerald-600" x-text="computed.kqNq57Ht"></span></div>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                         <div class="text-xs font-semibold text-slate-500 uppercase">Kế hoạch tuần tới</div>
@@ -138,28 +133,39 @@
                     </div>
                 </div>
 
-                <!-- Validation V1-V8 Status -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-base font-semibold text-slate-900 mb-4 flex items-center justify-between">
-                        <span>Kiểm tra Validation Dữ liệu (V1–V8)</span>
-                        <span class="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full font-medium">Hợp lệ 100%</span>
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
-                            <span class="text-slate-700">V1: Tổng nhiệm vụ = Các nguồn cộng lại</span>
-                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                <!-- Detailed Breakdown by Source Cards -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-900 text-base">Phân tích Chi tiết Theo Nguồn Giao Nhiệm Vụ</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <!-- NQ 57 -->
+                        <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                            <div class="text-xs font-semibold text-purple-700 uppercase">NQ 57-NQ/TW</div>
+                            <div class="text-2xl font-bold text-purple-900 mt-1" x-text="computed.kqNq57Tong"></div>
+                            <div class="text-xs text-purple-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqNq57Ht"></span></div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
-                            <span class="text-slate-700">V2: Tổng KH tuần tới = Sắp hạn + Chưa hạn</span>
-                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        <!-- Bộ giao -->
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                            <div class="text-xs font-semibold text-blue-700 uppercase">Bộ giao</div>
+                            <div class="text-2xl font-bold text-blue-900 mt-1" x-text="computed.kqBoTong"></div>
+                            <div class="text-xs text-blue-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqBoHt"></span></div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
-                            <span class="text-slate-700">V3: Hoàn thành ≤ Tổng nhiệm vụ tuần</span>
-                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        <!-- Tỉnh ủy giao -->
+                        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                            <div class="text-xs font-semibold text-indigo-700 uppercase">Tỉnh ủy giao</div>
+                            <div class="text-2xl font-bold text-indigo-900 mt-1" x-text="computed.kqTinhUyTong"></div>
+                            <div class="text-xs text-indigo-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqTinhUyHt"></span></div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
-                            <span class="text-slate-700">V4-V5: Tỷ lệ giải ngân chính xác (%)</span>
-                            <span class="text-emerald-600 font-bold">✓ Khớp</span>
+                        <!-- UBND tỉnh giao -->
+                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <div class="text-xs font-semibold text-emerald-700 uppercase">UBND tỉnh giao</div>
+                            <div class="text-2xl font-bold text-emerald-900 mt-1" x-text="computed.kqUbndTong"></div>
+                            <div class="text-xs text-emerald-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqUbndHt"></span></div>
+                        </div>
+                        <!-- Chuyên môn -->
+                        <div class="p-4 bg-slate-100 rounded-xl border border-slate-200">
+                            <div class="text-xs font-semibold text-slate-700 uppercase">Chuyên môn</div>
+                            <div class="text-2xl font-bold text-slate-900 mt-1" x-text="computed.kqChuyenMonTong"></div>
+                            <div class="text-xs text-slate-600 mt-1">Hoàn thành: <span class="font-semibold" x-text="computed.kqChuyenMonHt"></span></div>
                         </div>
                     </div>
                 </div>
@@ -183,7 +189,7 @@
                         <thead class="bg-slate-50">
                             <tr>
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">Đơn vị / Phòng</th>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nội dung nhiệm vụ</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">Nội dung nhiệm vụ & Dẫn chứng</th>
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">Nguồn giao</th>
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">Trạng thái</th>
                                 <th class="px-6 py-3 text-right font-semibold text-slate-600">Thao tác</th>
@@ -193,7 +199,10 @@
                             <template x-for="(task, index) in tasks" :key="index">
                                 <tr>
                                     <td class="px-6 py-4 font-medium text-slate-900" x-text="task.dept"></td>
-                                    <td class="px-6 py-4 text-slate-700 max-w-md truncate" x-text="task.content"></td>
+                                    <td class="px-6 py-4 text-slate-700 max-w-md">
+                                        <div x-text="task.content" class="font-medium"></div>
+                                        <div x-show="task.evidence" class="text-xs text-indigo-600 mt-1 italic" x-text="'Dẫn chứng: ' + task.evidence"></div>
+                                    </td>
                                     <td class="px-6 py-4">
                                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold" 
                                               :class="{
@@ -205,9 +214,14 @@
                                               }" x-text="task.source"></span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="text-xs font-medium px-2 py-0.5 rounded"
-                                              :class="task.status === 'HT' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'"
-                                              x-text="task.status === 'HT' ? 'Hoàn thành' : 'Kế hoạch tuần tới'"></span>
+                                        <span class="text-xs font-medium px-2.5 py-1 rounded-full inline-block"
+                                              :class="{
+                                                  'bg-emerald-100 text-emerald-800': task.status === 'Đã hoàn thành - Đúng hạn',
+                                                  'bg-amber-100 text-amber-800': task.status === 'Đã hoàn thành - Trễ hạn',
+                                                  'bg-red-100 text-red-800': task.status === 'Đang thực hiện - Trễ hạn',
+                                                  'bg-blue-100 text-blue-800': task.status === 'Đang thực hiện - Chưa tới hạn'
+                                              }"
+                                              x-text="task.status"></span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <button @click="removeTask(index)" class="text-red-500 hover:text-red-700 font-medium text-xs">Xóa</button>
@@ -382,20 +396,24 @@
                 <h3 class="font-bold text-lg text-slate-900">Cấu hình Tích hợp Google Drive</h3>
                 <button @click="openDriveModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
             </div>
-            <p class="text-sm text-slate-600">Kết nối tài khoản Google Workspace của Sở để tự động xuất và lưu file Word báo cáo tuần lên Drive.</p>
+            <p class="text-sm text-slate-600">Cập nhật tài khoản Google Workspace và thư mục lưu trữ báo cáo tự động của Sở.</p>
             <div class="space-y-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Tài khoản Google Drive</label>
-                    <input type="text" value="vanthu@skhcn.tayninh.gov.vn" class="w-full border rounded-lg p-2 text-sm bg-slate-50" readonly>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Tài khoản Google Drive (Email)</label>
+                    <input type="email" x-model="driveAccount" class="w-full border rounded-lg p-2 text-sm bg-white focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Thư mục lưu trữ báo cáo</label>
-                    <input type="text" x-model="driveFolder" class="w-full border rounded-lg p-2 text-sm">
+                    <input type="text" x-model="driveFolder" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center space-x-2 pt-1">
+                    <input type="checkbox" id="autoSyncCheck" x-model="autoSync" class="rounded text-indigo-600 focus:ring-indigo-500">
+                    <label for="autoSyncCheck" class="text-xs font-medium text-slate-700">Tự động đồng bộ khi xuất báo cáo tuần</label>
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2">
-                <button @click="openDriveModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Đóng</button>
-                <button @click="openDriveModal = false; alert('Đã lưu cấu hình kết nối Google Drive thành công!')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Lưu cấu hình</button>
+                <button @click="openDriveModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Hủy</button>
+                <button @click="saveDriveConfig()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm">Lưu cấu hình</button>
             </div>
         </div>
     </div>
@@ -410,7 +428,7 @@
             <div class="space-y-3">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Đơn vị / Phòng ban</label>
-                    <select x-form="newTask.dept" x-model="newTask.dept" class="w-full border rounded-lg p-2 text-sm">
+                    <select x-model="newTask.dept" class="w-full border rounded-lg p-2 text-sm">
                         <option>Phòng Khoa học</option>
                         <option>Phòng Công nghệ & ĐMST</option>
                         <option>Phòng Chuyển đổi số</option>
@@ -437,19 +455,31 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-700 mb-1">Trạng thái</label>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Trạng thái chi tiết</label>
                         <select x-model="newTask.status" class="w-full border rounded-lg p-2 text-sm">
-                            <option value="HT">Đã hoàn thành tuần này</option>
-                            <option value="KH">Kế hoạch tuần tới</option>
+                            <option value="Đã hoàn thành - Đúng hạn">Đã hoàn thành - Đúng hạn</option>
+                            <option value="Đã hoàn thành - Trễ hạn">Đã hoàn thành - Trễ hạn</option>
+                            <option value="Đang thực hiện - Trễ hạn">Đang thực hiện - Trễ hạn</option>
+                            <option value="Đang thực hiện - Chưa tới hạn">Đang thực hiện - Chưa tới hạn</option>
                         </select>
                     </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Dẫn chứng / Văn bản liên quan</label>
+                    <textarea x-model="newTask.evidence" rows="2" class="w-full border rounded-lg p-2 text-sm" placeholder="Nhập số quyết định, văn bản, link dẫn chứng..."></textarea>
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2">
                 <button @click="addTaskModal = false" class="px-4 py-2 border rounded-lg text-sm text-slate-700 hover:bg-slate-50">Hủy</button>
-                <button @click="saveTask()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Thêm nhiệm vụ</button>
+                <button @click="addTask()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Thêm nhiệm vụ</button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="showToast" x-transition class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-3 text-sm" x-cloak>
+        <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <span x-text="toastMessage"></span>
     </div>
 
     <!-- Application Script -->
@@ -460,7 +490,11 @@
                 openDriveModal: false,
                 addTaskModal: false,
                 isSyncing: false,
+                showToast: false,
+                toastMessage: '',
+                driveAccount: 'vanthu@skhcn.tayninh.gov.vn',
                 driveFolder: 'Sở KH&CN Tây Ninh / Báo Cáo Tuần 2026',
+                autoSync: true,
                 config: {
                     ngayBd: '2026-07-11',
                     ngayKt: '2026-07-16',
@@ -481,38 +515,60 @@
                     dept: 'Phòng Chuyển đổi số',
                     content: '',
                     source: 'UBND',
-                    status: 'HT'
+                    status: 'Đã hoàn thành - Đúng hạn',
+                    evidence: ''
                 },
                 tasks: [
-                    { dept: 'Phòng Chuyển đổi số', content: 'Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ NQ 57.', source: 'NQ57', status: 'HT' },
-                    { dept: 'Phòng Chuyển đổi số', content: 'Gửi văn bản góp ý Bộ KH&CN đối với dự thảo Quyết định Khung kiến trúc quốc gia số.', source: 'Bộ', status: 'HT' },
-                    { dept: 'Phòng KH & ĐMST', content: 'Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.', source: 'UBND', status: 'HT' },
-                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh ban hành Báo cáo kết quả chuyển đổi số 6 tháng đầu năm 2026.', source: 'UBND', status: 'HT' },
-                    { dept: 'Phòng TCĐLCL', content: 'Góp ý dự thảo Nghị quyết quy định mức chi xây dựng tiêu chuẩn cơ sở.', source: 'UBND', status: 'HT' },
-                    { dept: 'Phòng Kế hoạch - Tài chính', content: 'Tham mưu gửi UBND tỉnh và Bộ KH&CN cung cấp thông tin tài chính NQ 57.', source: 'UBND', status: 'HT' }
+                    { dept: 'Phòng Chuyển đổi số', content: 'Tham mưu Giám đốc Sở phân công nhiệm vụ báo cáo kết quả thực hiện nhiệm vụ NQ 57.', source: 'NQ57', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Công văn số 123/SKHCN-CĐS' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Gửi văn bản góp ý Bộ KH&CN đối với dự thảo Quyết định Khung kiến trúc quốc gia số.', source: 'Bộ', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Tờ trình số 45/TTr-SKHCN' },
+                    { dept: 'Phòng KH & ĐMST', content: 'Chiến lược phát triển hệ sinh thái thiết bị không người lái tỉnh Tây Ninh giai đoạn 2026 - 2030.', source: 'UBND', status: 'Đã hoàn thành - Đúng hạn', evidence: 'Quyết định số 89/QĐ-UBND' },
+                    { dept: 'Phòng Chuyển đổi số', content: 'Trình UBND tỉnh ban hành Báo cáo kết quả chuyển đổi số 6 tháng đầu năm 2026.', source: 'UBND', status: 'Đã hoàn thành - Trễ hạn', evidence: 'Báo cáo số 12/BC-SKHCN' },
+                    { dept: 'Phòng TCĐLCL', content: 'Góp ý dự thảo Nghị quyết quy định mức chi xây dựng tiêu chuẩn cơ sở.', source: 'UBND', status: 'Đang thực hiện - Trễ hạn', evidence: 'Đang chờ ý kiến phối hợp' },
+                    { dept: 'Phòng Kế hoạch - Tài chính', content: 'Tham mưu gửi UBND tỉnh và Bộ KH&CN cung cấp thông tin tài chính NQ 57.', source: 'UBND', status: 'Đang thực hiện - Chưa tới hạn', evidence: 'Hạn nộp 30/07/2026' }
                 ],
                 get computed() {
-                    const htList = this.tasks.filter(t => t.status === 'HT');
-                    const khList = this.tasks.filter(t => t.status === 'KH');
+                    const htList = this.tasks.filter(t => t.status && t.status.includes('Đã hoàn thành'));
+                    const khList = this.tasks.filter(t => t.status && t.status.includes('Đang thực hiện'));
                     return {
                         kqTong: htList.length,
-                        kqHt: htList.length,
+                        kqHt: htList.filter(t => t.status === 'Đã hoàn thành - Đúng hạn').length,
                         kqNq57Tong: htList.filter(t => t.source === 'NQ57').length,
-                        kqNq57Ht: htList.filter(t => t.source === 'NQ57' && t.status === 'HT').length,
+                        kqNq57Ht: htList.filter(t => t.source === 'NQ57' && t.status.includes('Đã hoàn thành')).length,
                         kqBoTong: htList.filter(t => t.source === 'Bộ').length,
+                        kqBoHt: htList.filter(t => t.source === 'Bộ' && t.status.includes('Đã hoàn thành')).length,
+                        kqTinhUyTong: htList.filter(t => t.source === 'Tỉnh ủy').length,
+                        kqTinhUyHt: htList.filter(t => t.source === 'Tỉnh ủy' && t.status.includes('Đã hoàn thành')).length,
+                        kqUbndTong: htList.filter(t => t.source === 'UBND').length,
+                        kqUbndHt: htList.filter(t => t.source === 'UBND' && t.status.includes('Đã hoàn thành')).length,
+                        kqChuyenMonTong: htList.filter(t => t.source === 'Chuyên môn').length,
+                        kqChuyenMonHt: htList.filter(t => t.source === 'Chuyên môn' && t.status.includes('Đã hoàn thành')).length,
                         khTong: khList.length + 18,
-                        khSapHan: 18,
-                        khChuaHan: khList.length
+                        khSapHan: khList.filter(t => t.status === 'Đang thực hiện - Trễ hạn').length + 18,
+                        khChuaHan: khList.filter(t => t.status === 'Đang thực hiện - Chưa tới hạn').length
                     }
                 },
                 addTask() {
                     if(!this.newTask.content) return;
                     this.tasks.push({...this.newTask});
                     this.newTask.content = '';
+                    this.newTask.evidence = '';
                     this.addTaskModal = false;
+                    this.triggerToast('Đã thêm nhiệm vụ thành công!');
                 },
                 removeTask(index) {
                     this.tasks.splice(index, 1);
+                    this.triggerToast('Đã xóa nhiệm vụ.');
+                },
+                saveDriveConfig() {
+                    this.openDriveModal = false;
+                    this.triggerToast('Đã lưu cấu hình Google Drive thành công (' + this.driveAccount + ')!');
+                },
+                triggerToast(msg) {
+                    this.toastMessage = msg;
+                    this.showToast = true;
+                    setTimeout(() => {
+                        this.showToast = false;
+                    }, 3000);
                 },
                 formatDate(dateStr) {
                     if(!dateStr) return '';
@@ -536,12 +592,13 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
+                    this.triggerToast('Đã tải xuống file Word báo cáo!');
                 },
                 syncToDrive() {
                     this.isSyncing = true;
                     setTimeout(() => {
                         this.isSyncing = false;
-                        alert('Đã tự động tạo file Word (.doc) và đồng bộ thành công lên Google Drive tại thư mục:\n' + this.driveFolder);
+                        this.triggerToast('Đã đồng bộ file Word thành công lên Google Drive tại thư mục: ' + this.driveFolder);
                     }, 1500);
                 }
             }
